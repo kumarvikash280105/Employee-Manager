@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
+    { "handle": "filesystem" },
+    { "src": "/admin", "dest": "/admin.html" },
+    { "src": "/roles-permissions", "dest": "/roles-permissions.html" },
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
