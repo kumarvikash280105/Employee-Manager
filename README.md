@@ -5,6 +5,7 @@
 [![Spring Security](https://img.shields.io/badge/Spring%20Security-6.3-green.svg?logo=springsecurity&logoColor=white)](https://spring.io/projects/spring-security)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18%2B-blue.svg?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Tests](https://img.shields.io/badge/Tests-33%2F33%20Passing-success.svg?logo=junit5&logoColor=white)](https://junit.org/junit5/)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/kumarvikash280105/Employee-Manager)
 [![Port](https://img.shields.io/badge/Server%20Port-8090-blueviolet.svg)](#-how-to-run--deploy)
 [![License](https://img.shields.io/badge/License-MIT-lightgrey.svg)](#)
 
