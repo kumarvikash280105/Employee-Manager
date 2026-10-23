@@ -1,0 +1,25 @@
+databases:
+  - name: empmanagedb
+    databaseName: empmanage_cms_db
+    user: empmanage_user
+    plan: free
+    region: oregon
+
+services:
+  - type: web
+    name: employee-manager
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: DB_URL
+        fromDatabase:
+          name: empmanagedb
+          property: connectionString
+      - key: DEMO_ACCOUNTS_ENABLED
+        value: "true"
+      - key: CORS_ALLOWED_ORIGINS
+        value: "*"

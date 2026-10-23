@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const getApiBase = () => {
     try {
-      if (window.location.protocol === 'file:' || (window.location.port && window.location.port !== '8090')) {
+      if (window.location.protocol === 'file:') {
         return 'http://localhost:8090/api';
       }
     } catch (e) {}

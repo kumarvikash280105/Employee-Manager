@@ -10,5 +10,5 @@ FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
 COPY --from=build /app/target/empmanage-cms-1.0.0.jar app.jar
 EXPOSE 8090
-ENV SERVER_PORT=8090
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV PORT=8090
+ENTRYPOINT ["sh", "-c", "java -Dserver.port=${PORT:-8090} -jar app.jar"]
