@@ -93,6 +93,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/attendance/punch").hasAnyRole("USER", "ADMIN", "HR_MANAGER", "MANAGER", "VIEWER")
                 .requestMatchers("/api/attendance/my").hasAnyRole("USER", "ADMIN", "HR_MANAGER", "MANAGER", "VIEWER")
                 .requestMatchers("/api/attendance/today").hasAnyRole("USER", "ADMIN", "HR_MANAGER", "MANAGER", "VIEWER")
+                .requestMatchers("/api/attendance/user/**").authenticated()
 
                 // Role & Permission Management
                 .requestMatchers("/roles-permissions.html").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGE")
@@ -105,6 +106,7 @@ public class SecurityConfig {
                 // Reports & Export
                 .requestMatchers("/api/reports/employees/csv").authenticated()
                 .requestMatchers("/api/reports/attendance/csv").authenticated()
+                .requestMatchers("/api/reports/attendance/user/csv").authenticated()
                 .requestMatchers("/api/reports/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "REPORT_EXPORT")
 
                 .requestMatchers("/api/attendance/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_MANAGER", "ATTENDANCE_VIEW", "ATTENDANCE_EDIT")

@@ -66,6 +66,41 @@ public class AttendanceController {
         return ResponseEntity.ok(ApiResponse.ok("Personal attendance logs fetched.", logs));
     }
 
+    @GetMapping("/user/{email}")
+    public ResponseEntity<ApiResponse<List<Attendance>>> getUserAttendanceHistory(
+            @PathVariable String email,
+            HttpServletRequest request) {
+
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Email parameter is required."));
+        }
+
+        String targetEmail = email.trim().toLowerCase();
+        String authEmail = getAuthenticatedEmail(request);
+
+        // Allow if querying own records or if caller has admin/manager privileges
+        boolean isSelf = (authEmail != null && authEmail.equalsIgnoreCase(targetEmail));
+        boolean isAdminOrManager = false;
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getAuthorities() != null) {
+            isAdminOrManager = auth.getAuthorities().stream().anyMatch(a ->
+                a.getAuthority().equals("ROLE_ADMIN") ||
+                a.getAuthority().equals("ROLE_HR_MANAGER") ||
+                a.getAuthority().equals("ROLE_MANAGER") ||
+                a.getAuthority().equals("ROLE_MANAGE") ||
+                a.getAuthority().equals("ATTENDANCE_VIEW")
+            );
+        }
+
+        if (!isSelf && !isAdminOrManager) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.error("You are not authorized to view another user's attendance history."));
+        }
+
+        List<Attendance> logs = attendanceService.getMyAttendanceLogs(targetEmail);
+        return ResponseEntity.ok(ApiResponse.ok("Attendance history for " + targetEmail + " fetched.", logs));
+    }
+
     @GetMapping("/all")
     public ResponseEntity<ApiResponse<List<Attendance>>> getAllAttendance() {
         List<Attendance> logs = attendanceService.getAllAttendanceLogs();

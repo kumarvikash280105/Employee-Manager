@@ -1164,6 +1164,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
+      // Update Personal Shift KPI Metrics in Attendance modal
+      const attKpiTotal = document.getElementById('attModalKpiTotal');
+      const attKpiPresent = document.getElementById('attModalKpiPresent');
+      const attKpiWfh = document.getElementById('attModalKpiWfh');
+      const attKpiHours = document.getElementById('attModalKpiHours');
+      const attModalExportCsvBtn = document.getElementById('attModalExportCsvBtn');
+
+      if (attModalExportCsvBtn && user && user.email) {
+        attModalExportCsvBtn.href = `/api/reports/attendance/user/csv?email=${encodeURIComponent(user.email)}`;
+      }
+
+      let pCount = 0;
+      let wCount = 0;
+      let totalMins = 0;
+      logs.forEach(l => {
+        const st = (l.status || '').toLowerCase();
+        const m = (l.mode || '').toLowerCase();
+        if (st === 'present' || m === 'office') pCount++;
+        if (st === 'wfh' || m === 'wfh') wCount++;
+        if (l.hours && l.hours !== '0 hrs' && l.hours !== 'In Progress') {
+          const hrMatch = l.hours.match(/(\d+)\s*hr/);
+          const minMatch = l.hours.match(/(\d+)\s*min/);
+          if (hrMatch) totalMins += parseInt(hrMatch[1], 10) * 60;
+          if (minMatch) totalMins += parseInt(minMatch[1], 10);
+        }
+      });
+      const hrs = Math.floor(totalMins / 60);
+      const mins = totalMins % 60;
+      const formattedMins = hrs > 0 ? `${hrs}h ${mins}m` : (mins > 0 ? `${mins}m` : (logs.length > 0 ? `${logs.length * 8}h est.` : '0 hrs'));
+
+      if (attKpiTotal) attKpiTotal.textContent = logs.length;
+      if (attKpiPresent) attKpiPresent.textContent = pCount;
+      if (attKpiWfh) attKpiWfh.textContent = wCount;
+      if (attKpiHours) attKpiHours.textContent = formattedMins;
+
       if (myAttendanceHistoryTableBody) {
         if (logs.length === 0) {
           myAttendanceHistoryTableBody.innerHTML = `
@@ -1622,9 +1657,190 @@ document.addEventListener('DOMContentLoaded', () => {
       if (polpNotice) polpNotice.style.display = canManage ? 'none' : 'inline-flex';
     }
 
+    switchUserAccountTab('security');
+    loadUserAccountAttendance(user);
+
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
   };
+
+  // =========================================================
+  // USER ACCOUNT MODAL: TAB NAVIGATION & ATTENDANCE HISTORY
+  // =========================================================
+  let userAccountAttendanceLogs = [];
+
+  window.switchUserAccountTab = (tab) => {
+    const secView = document.getElementById('userAccountSecurityView');
+    const attView = document.getElementById('userAccountAttendanceView');
+    const secBtn = document.getElementById('userAccountTabSecurityBtn');
+    const attBtn = document.getElementById('userAccountTabAttBtn');
+
+    if (tab === 'attendance') {
+      if (secView) secView.style.display = 'none';
+      if (attView) attView.style.display = 'block';
+      if (secBtn) {
+        secBtn.style.background = '#ffffff';
+        secBtn.style.color = '#334155';
+        secBtn.style.borderColor = '#cbd5e1';
+      }
+      if (attBtn) {
+        attBtn.style.background = '#0284c7';
+        attBtn.style.color = '#ffffff';
+        attBtn.style.borderColor = '#0284c7';
+      }
+      const user = getCurrentUser();
+      if (user) loadUserAccountAttendance(user);
+    } else {
+      if (secView) secView.style.display = 'block';
+      if (attView) attView.style.display = 'none';
+      if (secBtn) {
+        secBtn.style.background = '#0284c7';
+        secBtn.style.color = '#ffffff';
+        secBtn.style.borderColor = '#0284c7';
+      }
+      if (attBtn) {
+        attBtn.style.background = '#ffffff';
+        attBtn.style.color = '#334155';
+        attBtn.style.borderColor = '#cbd5e1';
+      }
+    }
+  };
+
+  const loadUserAccountAttendance = async (user) => {
+    if (!user || !user.email) return;
+    const tableBody = document.getElementById('userAccountAttendanceTableBody');
+    const exportCsvBtn = document.getElementById('userAccountAttExportCsvBtn');
+    if (exportCsvBtn) {
+      exportCsvBtn.href = `/api/reports/attendance/user/csv?email=${encodeURIComponent(user.email)}`;
+    }
+
+    if (tableBody) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+            ⏳ Loading your personal shift history...
+          </td>
+        </tr>
+      `;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/attendance/my?email=${encodeURIComponent(user.email)}`);
+      if (!res.ok) return;
+      const json = await res.json();
+      userAccountAttendanceLogs = json.data || [];
+      renderUserAccountAttendanceTable();
+    } catch (e) {
+      if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#ef4444; padding:20px;">Connection error loading attendance logs.</td></tr>`;
+      }
+    }
+  };
+
+  function renderUserAccountAttendanceTable() {
+    const tableBody = document.getElementById('userAccountAttendanceTableBody');
+    const searchInput = document.getElementById('userAccountAttSearchInput');
+    const searchQuery = (searchInput ? searchInput.value : '').toLowerCase().trim();
+
+    const kpiTotalEl = document.getElementById('userAccountAttKpiTotal');
+    const kpiPresentEl = document.getElementById('userAccountAttKpiPresent');
+    const kpiWfhEl = document.getElementById('userAccountAttKpiWfh');
+    const kpiHoursEl = document.getElementById('userAccountAttKpiHours');
+
+    let presentCount = 0;
+    let wfhCount = 0;
+    let totalMinutes = 0;
+
+    userAccountAttendanceLogs.forEach(l => {
+      const st = (l.status || '').toLowerCase();
+      const mode = (l.mode || '').toLowerCase();
+      if (st === 'present' || mode === 'office') presentCount++;
+      if (st === 'wfh' || mode === 'wfh') wfhCount++;
+
+      if (l.hours && l.hours !== '0 hrs' && l.hours !== 'In Progress') {
+        const hrMatch = l.hours.match(/(\d+)\s*hr/);
+        const minMatch = l.hours.match(/(\d+)\s*min/);
+        if (hrMatch) totalMinutes += parseInt(hrMatch[1], 10) * 60;
+        if (minMatch) totalMinutes += parseInt(minMatch[1], 10);
+      }
+    });
+
+    const calcHours = Math.floor(totalMinutes / 60);
+    const calcMins = totalMinutes % 60;
+    let formattedHours = '0 hrs';
+    if (calcHours > 0 || calcMins > 0) {
+      formattedHours = calcHours > 0 ? `${calcHours}h ${calcMins}m` : `${calcMins}m`;
+    } else if (userAccountAttendanceLogs.length > 0) {
+      formattedHours = `${userAccountAttendanceLogs.length * 8}h est.`;
+    }
+
+    if (kpiTotalEl) kpiTotalEl.textContent = userAccountAttendanceLogs.length;
+    if (kpiPresentEl) kpiPresentEl.textContent = presentCount;
+    if (kpiWfhEl) kpiWfhEl.textContent = wfhCount;
+    if (kpiHoursEl) kpiHoursEl.textContent = formattedHours;
+
+    let filtered = userAccountAttendanceLogs.filter(item => {
+      if (searchQuery) {
+        const text = `${item.date || ''} ${item.mode || ''} ${item.status || ''} ${item.timeIn || ''} ${item.timeOut || ''} ${item.hours || ''}`.toLowerCase();
+        if (!text.includes(searchQuery)) return false;
+      }
+      return true;
+    });
+
+    if (!tableBody) return;
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 24px; color: var(--text-muted);">
+            No attendance records matching your filter.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = filtered.map(item => {
+      let statusBg = '#dcfce7';
+      let statusColor = '#15803d';
+      if (item.status === 'WFH') {
+        statusBg = '#dbeafe';
+        statusColor = '#1d4ed8';
+      } else if (item.status === 'On Leave') {
+        statusBg = '#fef3c7';
+        statusColor = '#b45309';
+      } else if (item.status === 'Absent' || item.status === 'Not Punched In') {
+        statusBg = '#fee2e2';
+        statusColor = '#b91c1c';
+      }
+
+      const isOngoing = (item.timeOut === 'Ongoing Shift' || item.punchedIn);
+
+      return `
+        <tr>
+          <td><strong style="color:var(--text-main);">${escapeHtml(item.date)}</strong></td>
+          <td><span style="font-weight:600; color:#334155;">${escapeHtml(item.mode || 'Office')}</span></td>
+          <td><code>${escapeHtml(item.timeIn)}</code></td>
+          <td>
+            ${isOngoing
+              ? `<span style="background: #fef3c7; color: #b45309; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; display: inline-block;">Ongoing Shift</span>`
+              : `<code>${escapeHtml(item.timeOut)}</code>`}
+          </td>
+          <td><span style="color:#475569; font-weight:600;">${escapeHtml(item.hours)}</span></td>
+          <td>
+            <span style="display:inline-block; padding:3px 10px; border-radius:12px; font-size:11.5px; font-weight:700; background:${statusBg}; color:${statusColor};">
+              ${escapeHtml(item.status)}
+            </span>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  const userAccountAttSearchInput = document.getElementById('userAccountAttSearchInput');
+  if (userAccountAttSearchInput) {
+    userAccountAttSearchInput.addEventListener('input', () => renderUserAccountAttendanceTable());
+  }
 
   const closeUserRoleModalBtn = document.getElementById('closeUserRoleModal');
   const closeUserRoleModalBtnFooter = document.getElementById('closeUserRoleModalBtn');

@@ -258,7 +258,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${escapeHtml(user.fullName ? user.fullName.charAt(0).toUpperCase() : 'U')}
               </div>
               <div>
-                <strong>${escapeHtml(user.fullName || 'User')}</strong>
+                <a href="javascript:void(0)" onclick="viewUserAttendanceHistory('${escapeHtml(user.email)}', '${escapeHtml(user.fullName || user.email)}')" style="color:var(--text-main); font-weight:700; text-decoration:underline; cursor:pointer;" title="Click to view full shift & attendance history">
+                  ${escapeHtml(user.fullName || 'User')}
+                </a>
               </div>
             </div>
           </td>
@@ -270,16 +272,17 @@ document.addEventListener('DOMContentLoaded', async () => {
           </td>
           <td>${escapeHtml(user.department || 'General')}</td>
           <td style="text-align: right;">
-            ${user.email === 'admin@empmanage.com' 
-              ? '<span style="font-size: 12px; color: #94a3b8; font-style: italic;">Protected Master Admin</span>'
-              : `
-                <div style="display:flex; gap:6px; justify-content:flex-end;">
+            <div style="display:flex; gap:6px; justify-content:flex-end; align-items:center;">
+              <button type="button" class="btn-sm-edit" style="background:#f0fdf4; border-color:#86efac; color:#166534; font-weight:600; display:inline-flex; align-items:center; gap:4px;" onclick="viewUserAttendanceHistory('${escapeHtml(user.email)}', '${escapeHtml(user.fullName || user.email)}')" title="View Shift & Attendance History">⏱️ Attendance</button>
+              ${user.email === 'admin@empmanage.com' 
+                ? '<span style="font-size: 12px; color: #94a3b8; font-style: italic; margin-left: 4px;">Protected Master Admin</span>'
+                : `
                   <button class="btn-sm-edit" onclick="openChangeUserRoleModal('${escapeHtml(user.email)}')" title="Change User Role">✏️ Change Role</button>
                   <a href="roles-permissions.html" class="btn-sm-edit" style="text-decoration:none;" title="View Permission Matrix">🛡️ Permissions</a>
                   <button class="btn-sm-delete" onclick="deleteUserAccount('${escapeHtml(user.email)}')" title="Delete Account">Delete</button>
-                </div>
-              `
-            }
+                `
+              }
+            </div>
           </td>
         </tr>`;
       }).join('');
@@ -470,7 +473,9 @@ document.addEventListener('DOMContentLoaded', async () => {
       adminEmployeesTableBody.innerHTML = emps.map(emp => {
         const deptName = emp.departmentName || (emp.department && emp.department.name) || (typeof emp.department === 'string' ? emp.department : '') || 'General';
         
-        let actionButtons = '';
+        let actionButtons = `
+          <button type="button" class="btn-sm-edit" style="background:#f0fdf4; border-color:#86efac; color:#166534; font-weight:600; display:inline-flex; align-items:center; gap:4px;" onclick="viewUserAttendanceHistory('${escapeHtml(emp.email)}', '${escapeHtml(emp.name)}')" title="View Employee Attendance History">⏱️ Attendance</button>
+        `;
         if (canEdit) {
           actionButtons += `<button class="btn-sm-edit" onclick="editEmpFromAdmin(${emp.id})">Edit</button>`;
         }
@@ -478,14 +483,16 @@ document.addEventListener('DOMContentLoaded', async () => {
           actionButtons += `<button class="btn-sm-delete" onclick="deleteEmpFromAdmin(${emp.id})">Delete</button>`;
         }
         if (!canEdit && !canDelete) {
-          actionButtons = `<span style="font-size: 11.5px; color: #94a3b8; font-weight: 600; padding: 3px 8px; background: #f1f5f9; border-radius: 4px;">Read-Only</span>`;
+          actionButtons += `<span style="font-size: 11.5px; color: #94a3b8; font-weight: 600; padding: 3px 8px; background: #f1f5f9; border-radius: 4px;">Read-Only</span>`;
         }
 
         return `
         <tr>
           <td>
             <div style="display:flex; align-items:center; gap:8px;">
-              <strong>${escapeHtml(emp.name)}</strong>
+              <a href="javascript:void(0)" onclick="viewUserAttendanceHistory('${escapeHtml(emp.email)}', '${escapeHtml(emp.name)}')" style="color:var(--text-main); font-weight:700; text-decoration:underline; cursor:pointer;" title="Click to view full shift & attendance history">
+                ${escapeHtml(emp.name)}
+              </a>
               <span style="font-size:11px; color:#64748b; font-family:monospace;">(${escapeHtml(emp.employeeCode || '')})</span>
             </div>
           </td>
@@ -910,7 +917,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ${escapeHtml(item.userName ? item.userName.charAt(0).toUpperCase() : 'U')}
               </div>
               <div>
-                <a href="javascript:void(0)" onclick="filterStaffAttendance('${escapeHtml(item.userEmail)}')" style="font-weight: 700; color: var(--primary); text-decoration: none;">
+                <a href="javascript:void(0)" onclick="viewUserAttendanceHistory('${escapeHtml(item.userEmail)}', '${escapeHtml(item.userName)}')" style="font-weight: 700; color: var(--primary); text-decoration: underline;" title="View complete shift & attendance history">
                   ${escapeHtml(item.userName)}
                 </a>
                 <div style="font-size: 11px; color: #64748b; font-family: monospace;">${escapeHtml(item.userEmail)}</div>
@@ -970,6 +977,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         showToast(`Attendance status updated to "${newStatus}".`, 'success');
         loadAttendanceLogs();
         updateStats();
+        if (currentInspectedUserEmail && typeof renderInspectedUserAttendanceTable === 'function') {
+          const item = currentInspectedUserLogs.find(l => l.id === id);
+          if (item) {
+            item.status = newStatus;
+            renderInspectedUserAttendanceTable();
+          }
+        }
       } else {
         showToast(json.message || 'Status override failed.', 'error');
       }
@@ -1078,6 +1092,9 @@ document.addEventListener('DOMContentLoaded', async () => {
           closePunchOutModalFn();
           await loadAttendanceLogs();
           updateStats();
+          if (currentInspectedUserEmail && typeof window.viewUserAttendanceHistory === 'function') {
+            window.viewUserAttendanceHistory(currentInspectedUserEmail, currentInspectedUserName);
+          }
         } else {
           showToast(json.message || 'Error executing punch out.', 'error');
         }
@@ -1455,6 +1472,221 @@ document.addEventListener('DOMContentLoaded', async () => {
       showToast('Connection error deleting inquiry.', 'error');
     }
   };
+
+  // =========================================================
+  // DEDICATED INDIVIDUAL USER ATTENDANCE HISTORY INSPECTION
+  // =========================================================
+  let currentInspectedUserLogs = [];
+  let currentInspectedUserEmail = '';
+  let currentInspectedUserName = '';
+
+  window.closeAdminUserAttendanceModalFunc = () => {
+    const modal = document.getElementById('adminUserAttendanceModalBackdrop');
+    if (modal) {
+      modal.classList.remove('open');
+      modal.style.display = 'none';
+      document.body.style.overflow = '';
+    }
+  };
+
+  const closeAdminUserAttBtn = document.getElementById('closeAdminUserAttendanceModal');
+  const closeAdminUserAttFooterBtn = document.getElementById('closeAdminUserAttendanceModalFooter');
+  if (closeAdminUserAttBtn) closeAdminUserAttBtn.addEventListener('click', window.closeAdminUserAttendanceModalFunc);
+  if (closeAdminUserAttFooterBtn) closeAdminUserAttFooterBtn.addEventListener('click', window.closeAdminUserAttendanceModalFunc);
+
+  const adminUserAttStatusFilter = document.getElementById('adminUserAttStatusFilter');
+  const adminUserAttSearchInput = document.getElementById('adminUserAttSearchInput');
+  if (adminUserAttStatusFilter) adminUserAttStatusFilter.addEventListener('change', () => renderInspectedUserAttendanceTable());
+  if (adminUserAttSearchInput) adminUserAttSearchInput.addEventListener('input', () => renderInspectedUserAttendanceTable());
+
+  window.viewUserAttendanceHistory = async (email, name) => {
+    if (!email) return;
+    currentInspectedUserEmail = email.trim();
+    currentInspectedUserName = name || email.split('@')[0];
+
+    const modal = document.getElementById('adminUserAttendanceModalBackdrop');
+    if (!modal) return;
+
+    const targetNameEl = document.getElementById('adminUserAttTargetName');
+    const targetEmailEl = document.getElementById('adminUserAttTargetEmail');
+    const fullNameDisplayEl = document.getElementById('adminUserAttFullNameDisplay');
+    const deptDisplayEl = document.getElementById('adminUserAttDeptDisplay');
+    const roleDisplayEl = document.getElementById('adminUserAttRoleDisplay');
+    const avatarEl = document.getElementById('adminUserAttAvatarCircle');
+    const exportCsvBtn = document.getElementById('adminUserAttExportCsvBtn');
+    const tableBody = document.getElementById('adminUserAttendanceTableBody');
+
+    if (targetNameEl) targetNameEl.textContent = currentInspectedUserName;
+    if (targetEmailEl) targetEmailEl.textContent = currentInspectedUserEmail;
+    if (fullNameDisplayEl) fullNameDisplayEl.textContent = currentInspectedUserName;
+    if (avatarEl) avatarEl.textContent = currentInspectedUserName.charAt(0).toUpperCase();
+
+    // Check registeredUsersCache to populate dept & role
+    const cachedUser = (registeredUsersCache || []).find(u => u.email && u.email.toLowerCase() === currentInspectedUserEmail.toLowerCase());
+    if (cachedUser) {
+      if (deptDisplayEl) deptDisplayEl.textContent = cachedUser.department || 'General';
+      if (roleDisplayEl) {
+        roleDisplayEl.textContent = cachedUser.displayRole || (cachedUser.isAdmin ? 'ADMIN' : 'EMPLOYEE');
+      }
+    } else {
+      if (deptDisplayEl) deptDisplayEl.textContent = 'General';
+      if (roleDisplayEl) roleDisplayEl.textContent = 'EMPLOYEE';
+    }
+
+    if (exportCsvBtn) {
+      exportCsvBtn.href = `/api/reports/attendance/user/csv?email=${encodeURIComponent(currentInspectedUserEmail)}`;
+    }
+
+    if (tableBody) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 28px; color: #64748b;">
+            ⏳ Loading complete shift history for <strong>${escapeHtml(currentInspectedUserName)}</strong>...
+          </td>
+        </tr>
+      `;
+    }
+
+    modal.style.display = 'flex';
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    try {
+      const res = await fetch(`${API_BASE}/attendance/user/${encodeURIComponent(currentInspectedUserEmail)}`);
+      if (!res.ok) {
+        if (tableBody) {
+          tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:20px;">Could not load attendance records.</td></tr>`;
+        }
+        return;
+      }
+      const json = await res.json();
+      currentInspectedUserLogs = json.data || [];
+      renderInspectedUserAttendanceTable();
+    } catch (e) {
+      if (tableBody) {
+        tableBody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#ef4444; padding:20px;">Connection error loading attendance logs.</td></tr>`;
+      }
+    }
+  };
+
+  function renderInspectedUserAttendanceTable() {
+    const tableBody = document.getElementById('adminUserAttendanceTableBody');
+    const statusFilter = document.getElementById('adminUserAttStatusFilter')?.value || 'ALL';
+    const searchQuery = (document.getElementById('adminUserAttSearchInput')?.value || '').toLowerCase().trim();
+
+    const kpiTotalEl = document.getElementById('adminUserAttKpiTotal');
+    const kpiPresentEl = document.getElementById('adminUserAttKpiPresent');
+    const kpiWfhEl = document.getElementById('adminUserAttKpiWfh');
+    const kpiLeaveEl = document.getElementById('adminUserAttKpiLeave');
+    const kpiHoursEl = document.getElementById('adminUserAttKpiHours');
+
+    let presentCount = 0;
+    let wfhCount = 0;
+    let leaveCount = 0;
+    let totalMinutes = 0;
+
+    currentInspectedUserLogs.forEach(l => {
+      const st = (l.status || '').toLowerCase();
+      const mode = (l.mode || '').toLowerCase();
+      if (st === 'present' || mode === 'office') presentCount++;
+      if (st === 'wfh' || mode === 'wfh') wfhCount++;
+      if (st === 'on leave' || mode === 'leave') leaveCount++;
+
+      if (l.hours && l.hours !== '0 hrs' && l.hours !== 'In Progress') {
+        const hrMatch = l.hours.match(/(\d+)\s*hr/);
+        const minMatch = l.hours.match(/(\d+)\s*min/);
+        if (hrMatch) totalMinutes += parseInt(hrMatch[1], 10) * 60;
+        if (minMatch) totalMinutes += parseInt(minMatch[1], 10);
+      }
+    });
+
+    const calcHours = Math.floor(totalMinutes / 60);
+    const calcMins = totalMinutes % 60;
+    let formattedHours = '0 hrs';
+    if (calcHours > 0 || calcMins > 0) {
+      formattedHours = calcHours > 0 ? `${calcHours}h ${calcMins}m` : `${calcMins}m`;
+    } else if (currentInspectedUserLogs.length > 0) {
+      formattedHours = `${currentInspectedUserLogs.length * 8}h est.`;
+    }
+
+    if (kpiTotalEl) kpiTotalEl.textContent = currentInspectedUserLogs.length;
+    if (kpiPresentEl) kpiPresentEl.textContent = presentCount;
+    if (kpiWfhEl) kpiWfhEl.textContent = wfhCount;
+    if (kpiLeaveEl) kpiLeaveEl.textContent = leaveCount;
+    if (kpiHoursEl) kpiHoursEl.textContent = formattedHours;
+
+    let filtered = currentInspectedUserLogs.filter(item => {
+      if (statusFilter !== 'ALL' && item.status !== statusFilter) return false;
+      if (searchQuery) {
+        const text = `${item.date || ''} ${item.mode || ''} ${item.status || ''} ${item.timeIn || ''} ${item.timeOut || ''} ${item.hours || ''}`.toLowerCase();
+        if (!text.includes(searchQuery)) return false;
+      }
+      return true;
+    });
+
+    if (!tableBody) return;
+
+    if (filtered.length === 0) {
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; padding: 24px; color: #64748b;">
+            No shift records matching your filter.
+          </td>
+        </tr>
+      `;
+      return;
+    }
+
+    tableBody.innerHTML = filtered.map(item => {
+      let statusBg = '#dcfce7';
+      let statusColor = '#15803d';
+      if (item.status === 'WFH') {
+        statusBg = '#dbeafe';
+        statusColor = '#1d4ed8';
+      } else if (item.status === 'On Leave') {
+        statusBg = '#fef3c7';
+        statusColor = '#b45309';
+      } else if (item.status === 'Absent' || item.status === 'Not Punched In') {
+        statusBg = '#fee2e2';
+        statusColor = '#b91c1c';
+      }
+
+      const isOngoing = (item.timeOut === 'Ongoing Shift' || item.punchedIn);
+
+      return `
+        <tr>
+          <td><strong style="color: #0f172a;">${escapeHtml(item.date)}</strong></td>
+          <td><span style="font-weight: 600; color: #334155;">${escapeHtml(item.mode || 'Office')}</span></td>
+          <td><code>${escapeHtml(item.timeIn)}</code></td>
+          <td>
+            ${isOngoing
+              ? `<span style="background: #fef3c7; color: #b45309; font-size: 11px; font-weight: 700; padding: 2px 7px; border-radius: 4px; display: inline-block;">Ongoing Shift</span>`
+              : `<code>${escapeHtml(item.timeOut)}</code>`}
+          </td>
+          <td><span style="color: #475569; font-weight: 600;">${escapeHtml(item.hours)}</span></td>
+          <td>
+            <span style="display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 11.5px; font-weight: 700; background: ${statusBg}; color: ${statusColor};">
+              ${escapeHtml(item.status)}
+            </span>
+          </td>
+          <td style="text-align: right; white-space: nowrap;">
+            ${isOngoing ? `
+              <button type="button" class="btn btn-sm" onclick="openAdminPunchOutModal(${item.id})" style="background: #ea580c; color: #fff; border: none; padding: 3px 8px; font-size: 11.5px; border-radius: 4px; font-weight: 600; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.1);" title="Force punch out for ${escapeHtml(item.date)}">
+                🚪 Punch Out
+              </button>
+            ` : `
+              <select class="form-select" style="padding: 2px 6px; font-size: 11px; width: auto; display: inline-block;" onchange="changeAdminHistoryStatus(${item.id}, this.value)">
+                <option value="Present" ${item.status === 'Present' ? 'selected' : ''}>Present</option>
+                <option value="WFH" ${item.status === 'WFH' ? 'selected' : ''}>WFH</option>
+                <option value="On Leave" ${item.status === 'On Leave' ? 'selected' : ''}>On Leave</option>
+                <option value="Absent" ${item.status === 'Absent' ? 'selected' : ''}>Absent</option>
+              </select>
+            `}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
 
   updateStats();
   renderUsersTable();

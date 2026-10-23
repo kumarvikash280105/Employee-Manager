@@ -74,6 +74,54 @@ public class ReportController {
             .body(bytes);
     }
 
+    @GetMapping("/attendance/user/csv")
+    public ResponseEntity<byte[]> exportUserAttendanceCsv(
+            @org.springframework.web.bind.annotation.RequestParam String email,
+            HttpServletRequest request) {
+
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        String targetEmail = email.trim().toLowerCase();
+        String callerEmail = getCallerEmail(request);
+        boolean isSelf = callerEmail != null && callerEmail.equalsIgnoreCase(targetEmail);
+        boolean hasAdminExport = hasCallerPermission(request, "ATTENDANCE_EXPORT") || hasCallerPermission(request, "REPORT_EXPORT");
+
+        if (!isSelf && !hasAdminExport) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{\"success\":false,\"message\":\"Access Denied: You do not have permission to export another user's attendance records.\"}".getBytes(StandardCharsets.UTF_8));
+        }
+
+        List<Attendance> logs = attendanceService.getMyAttendanceLogs(targetEmail);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("ID,Date,Employee Name,Work Email,Role,Department,Time In,Time Out,Work Hours,Status\n");
+
+        for (Attendance a : logs) {
+            sb.append(escapeCsvCell(a.getId())).append(",")
+              .append(escapeCsvCell(a.getDate())).append(",")
+              .append(escapeCsvCell(a.getUserName())).append(",")
+              .append(escapeCsvCell(a.getUserEmail())).append(",")
+              .append(escapeCsvCell(a.getUserRole())).append(",")
+              .append(escapeCsvCell(a.getDepartment())).append(",")
+              .append(escapeCsvCell(a.getTimeIn())).append(",")
+              .append(escapeCsvCell(a.getTimeOut())).append(",")
+              .append(escapeCsvCell(a.getHours())).append(",")
+              .append(escapeCsvCell(a.getStatus())).append("\n");
+        }
+
+        byte[] bytes = createUtf8CsvBytes(sb.toString());
+        String safeEmail = targetEmail.replaceAll("[^a-zA-Z0-9.-]", "_");
+        String filename = "Attendance_" + safeEmail + "_" + LocalDate.now() + ".csv";
+
+        return ResponseEntity.ok()
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+            .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
+            .body(bytes);
+    }
+
     @GetMapping("/employees/csv")
     public ResponseEntity<byte[]> exportEmployeesCsv(HttpServletRequest request) {
         if (!hasCallerPermission(request, "EMPLOYEE_EXPORT") && !hasCallerPermission(request, "REPORT_EXPORT")) {
@@ -105,6 +153,19 @@ public class ReportController {
             .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
             .contentType(MediaType.parseMediaType("text/csv; charset=UTF-8"))
             .body(bytes);
+    }
+
+    private String getCallerEmail(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null && session.getAttribute("CURRENT_USER") != null) {
+            User sessionUser = (User) session.getAttribute("CURRENT_USER");
+            return sessionUser.getEmail();
+        }
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated() && !"anonymousUser".equals(auth.getName())) {
+            return auth.getName();
+        }
+        return null;
     }
 
     private boolean hasCallerPermission(HttpServletRequest request, String permissionName) {
