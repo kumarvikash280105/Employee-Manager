@@ -305,12 +305,11 @@ button, input, select, textarea {
   align-items: center;
   gap: 10px;
   flex-shrink: 0;
-  flex-wrap: nowrap;
+  max-width: 100%;
 }
 
 .nav-actions > * {
-  white-space: nowrap !important;
-  flex-shrink: 0 !important;
+  white-space: nowrap;
 }
 
 .user-profile-badge {
@@ -1661,9 +1660,53 @@ button, input, select, textarea {
   }
 }
 
-@media (max-width: 768px) {
+/* Responsive Navigation Across Desktop, Laptops & Mobile */
+.mobile-nav-admin-wrap {
+  display: none;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1100px) {
+  .site-header .container {
+    padding: 0 16px;
+  }
+  .nav-list {
+    gap: 8px;
+  }
+  .nav-link {
+    padding: 6px 10px;
+    font-size: 13.5px;
+  }
+  .nav-actions {
+    gap: 6px;
+  }
+  .btn-nav-admin {
+    padding: 6px 10px;
+    font-size: 12.5px;
+  }
+  .btn-nav-register {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 992px) {
   .mobile-toggle {
     display: flex;
+  }
+
+  .mobile-nav-admin-wrap {
+    display: block;
   }
 
   .nav-menu {
@@ -1671,25 +1714,78 @@ button, input, select, textarea {
     top: 68px;
     left: 0;
     width: 100%;
-    background-color: var(--navy-bg);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    padding: 20px;
+    background-color: #0b1a30;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4);
+    padding: 16px 20px 22px;
     display: none;
+    z-index: 999;
   }
 
   .nav-menu.open {
     display: block;
+    animation: fadeInDown 0.2s ease-out;
   }
 
   .nav-list {
     flex-direction: column;
     align-items: stretch;
-    gap: 10px;
+    gap: 8px;
   }
 
   .nav-link {
     display: block;
-    text-align: center;
+    text-align: left;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .nav-link:hover, .nav-link.active {
+    background: var(--primary);
+  }
+}
+
+@media (max-width: 768px) {
+  .site-header .container {
+    padding: 0 12px;
+  }
+
+  .nav-container {
+    height: 60px;
+    gap: 6px;
+  }
+
+  .nav-menu {
+    top: 60px;
+  }
+
+  .brand-logo .logo-icon {
+    width: 28px;
+    height: 24px;
+  }
+
+  .brand-logo .logo-text {
+    font-size: 18px;
+  }
+
+  .nav-actions {
+    gap: 6px;
+  }
+
+  .btn-login {
+    padding: 6px 10px;
+    font-size: 12.5px;
+  }
+
+  .btn-nav-register {
+    padding: 6px 11px;
+    font-size: 12.5px;
+  }
+
+  .btn-nav-admin {
+    padding: 6px 9px;
+    font-size: 11.5px;
   }
 
   .features-grid {
@@ -1721,6 +1817,92 @@ button, input, select, textarea {
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .site-header .container {
+    padding: 0 10px;
+  }
+
+  .nav-container {
+    height: 56px;
+    gap: 4px;
+  }
+
+  .nav-menu {
+    top: 56px;
+  }
+
+  .brand-logo .logo-text {
+    font-size: 16px;
+  }
+
+  .brand-logo .logo-icon {
+    width: 24px;
+    height: 20px;
+  }
+
+  /* Hide the wide 'Admin Portal' button from the top navbar on mobile phones to prevent overflow */
+  #openAdminLoginNavBtn {
+    display: none !important;
+  }
+
+  .btn-login {
+    padding: 5px 9px;
+    font-size: 12px;
+  }
+
+  .btn-nav-register {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+
+  .mobile-toggle {
+    width: 32px;
+    height: 32px;
+    padding: 5px;
+    margin-left: 2px;
+  }
+
+  .user-name-txt {
+    max-width: 75px;
+    font-size: 12px;
+  }
+
+  .btn-nav-role {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+
+  .btn-nav-attendance {
+    padding: 5px 8px;
+    font-size: 11.5px;
+  }
+
+  .btn-nav-logout {
+    padding: 5px 8px;
+    font-size: 11.5px;
+  }
+}
+
+@media (max-width: 380px) {
+  .site-header .container {
+    padding: 0 6px;
+  }
+
+  .brand-logo .logo-text {
+    font-size: 14.5px;
+  }
+
+  .btn-login {
+    padding: 4px 7px;
+    font-size: 11px;
+  }
+
+  .btn-nav-register {
+    padding: 4px 8px;
+    font-size: 11px;
   }
 }
 

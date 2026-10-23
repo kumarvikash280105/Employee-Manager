@@ -31,6 +31,11 @@
           <li><a href="#departments" class="nav-link">Departments</a></li>
           <li><a href="#about" class="nav-link">About</a></li>
           <li><a href="#contact" class="nav-link">Contact</a></li>
+          <li class="mobile-nav-admin-wrap">
+            <button type="button" class="btn-nav-admin" onclick="openAuthModal('admin'); document.getElementById('navMenu').classList.remove('open'); document.getElementById('mobileToggle').classList.remove('active');" style="width: 100%; justify-content: center; padding: 10px 14px; margin-top: 8px; font-size: 13.5px; border-radius: 8px;">
+              <span>🛡️ Admin Portal Login</span>
+            </button>
+          </li>
         </ul>
       </nav>
       <div class="nav-actions" id="authActionsContainer">

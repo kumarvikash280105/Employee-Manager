@@ -1642,6 +1642,31 @@ document.addEventListener('DOMContentLoaded', () => {
   loadCmsContent();
   loadDepartments();
 
+  // Mobile Navigation Hamburger Toggle Handling
+  const mobileToggle = document.getElementById('mobileToggle');
+  const navMenu = document.getElementById('navMenu');
+  if (mobileToggle && navMenu) {
+    mobileToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navMenu.classList.toggle('open');
+      mobileToggle.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
+        navMenu.classList.remove('open');
+        mobileToggle.classList.remove('active');
+      }
+    });
+
+    navMenu.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', () => {
+        navMenu.classList.remove('open');
+        mobileToggle.classList.remove('active');
+      });
+    });
+  }
+
   const urlParams = new URLSearchParams(window.location.search);
   if (urlParams.get('error') === 'unauthorized') {
     showToast('Administrator login required to access Admin Control Center.', 'error');
