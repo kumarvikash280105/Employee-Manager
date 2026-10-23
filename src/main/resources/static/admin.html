@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Control Center &amp; CMS Hub - EmpManage</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --admin-bg: #f1f5f9;
+      --admin-surface: #ffffff;
+      --admin-border: #e2e8f0;
+      --admin-primary: #1e3a8a;
+      --admin-accent: #2563eb;
+    }
+
+    body.admin-body {
+      background-color: var(--admin-bg);
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+      color: #0f172a;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Top Navigation Header */
+    .admin-header {
+      background-color: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .admin-nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      padding: 0 16px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      flex-shrink: 0 !important;
+    }
+
+    .admin-nav-pills {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: #1e293b;
+      padding: 3px 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 1;
+      min-width: 0;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+
+    .admin-nav-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .admin-nav-pill {
+      color: #94a3b8;
+      text-decoration: none;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .admin-nav-pill:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .admin-nav-pill.active {
+      color: #ffffff;
+      background: #0284c7;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+    }
+
+    .admin-user-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0 !important;
+      margin-left: auto;
+      padding-right: 2px;
+    }
+
+    .admin-user-info {
+      text-align: right;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .admin-user-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f8fafc;
+      white-space: nowrap;
+    }
+
+    .admin-user-role-tag {
+      font-size: 10.5px;
+      color: #38bdf8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .admin-btn-dashboard {
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid #334155;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0 !important;
+    }
+
+    .admin-btn-dashboard:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #475569;
+      color: #ffffff;
+    }
+
+    .admin-btn-logout {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #ef4444;
+      border: 1px solid #dc2626;
+      color: #ffffff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-btn-logout:hover {
+      background: #dc2626;
+    }
+
+    .admin-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .admin-metric-card {
+      background: var(--admin-surface);
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .admin-metric-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .admin-card {
+      background-color: #ffffff;
+      border-radius: 14px;
+      border: 1px solid var(--admin-border);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+      margin-bottom: 30px;
+      overflow: hidden;
+      scroll-margin-top: 85px;
+    }
+
+    .admin-card-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: #ffffff;
+    }
+
+    .admin-card-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #0f172a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
+    }
+
+    .admin-card-body {
+      padding: 24px;
+    }
+
+    .role-badge-admin {
+      background-color: #fee2e2;
+      color: #ef4444;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .role-badge-emp {
+      background-color: #e0f2fe;
+      color: #0284c7;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .btn-sm-delete {
+      background: transparent;
+      border: 1px solid #fca5a5;
+      color: #ef4444;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-sm-delete:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .btn-sm-edit {
+      background: transparent;
+      border: 1px solid #93c5fd;
+      color: #2563eb;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-sm-edit:hover {
+      background: #2563eb;
+      color: #ffffff;
+    }
+
+    .cms-editor-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 24px;
+    }
+
+    .cms-editor-box {
+      background: #f8fafc;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .cms-box-header {
+      font-size: 15px;
+      font-weight: 700;
+      color: #1e3a8a;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    @media (max-width: 900px) {
+      .admin-nav-pills { display: none; }
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- =========================================================
+       ADMIN HEADER & TOP NAVIGATION
+       ========================================================= -->
+  <header class="admin-header">
+    <div class="admin-nav-container">
+      
+      <!-- Brand Logo + Admin Tag -->
+      <a href="index.html" class="brand-logo" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+        <svg class="logo-icon" viewBox="0 0 42 32" fill="none" style="width:28px; height:28px;">
+          <circle cx="21" cy="9" r="6" fill="#ffffff" />
+          <path d="M7 29c0-6 6-10 14-10s14 4 14 10" fill="#3b82f6" />
+        </svg>
+        <span style="font-size: 18px; font-weight: 800; color: #ffffff;">EmpManage</span>
+      </a>
+
+      <!-- Navigation Pills (Logical Sequence: Workforce -> Attendance -> Departments -> Accounts -> Roles & Permissions -> CMS -> Inquiries) -->
+      <nav class="admin-nav-pills">
+        <a href="#panelEmployees" class="admin-nav-pill">
+          <span>👥 Workforce</span>
+        </a>
+        <a href="#panelAttendance" class="admin-nav-pill">
+          <span>⏱️ Attendance</span>
+        </a>
+        <a href="#panelDepartments" class="admin-nav-pill">
+          <span>🏢 Departments</span>
+        </a>
+        <a href="#panelUsers" class="admin-nav-pill">
+          <span>👤 Accounts</span>
+        </a>
+        <a href="roles-permissions.html" class="admin-nav-pill">
+          <span>🛡️ Roles &amp; Permissions</span>
+        </a>
+        <a href="#panelCms" class="admin-nav-pill">
+          <span>🌐 Website CMS</span>
+        </a>
+        <a href="#panelInquiries" class="admin-nav-pill">
+          <span>✉️ Inquiries</span>
+        </a>
+      </nav>
+
+      <div class="admin-user-block">
+        <div class="admin-user-info">
+          <div class="admin-user-name" id="adminHeaderName">System Administrator</div>
+          <div class="admin-user-role-tag">Super Admin</div>
+        </div>
+        <a href="index.html" class="admin-btn-dashboard" target="_blank">
+          🌐 View Website
+        </a>
+        <button type="button" class="admin-btn-logout" id="adminLogoutBtn">
+          Logout
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <main style="flex: 1; padding: 32px 24px; max-width: 1400px; margin: 0 auto; width: 100%;">
+
+    <div class="admin-metrics-grid">
+      
+      <div class="admin-metric-card">
+        <div class="admin-metric-icon" style="background: #e0f2fe; color: #0284c7;">👥</div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;">Registered Users</div>
+          <div style="font-size: 26px; font-weight: 800; color: #0f172a;" id="statRegisteredUsers">--</div>
+        </div>
+      </div>
+
+      <div class="admin-metric-card">
+        <div class="admin-metric-icon" style="background: #dcfce7; color: #16a34a;">👔</div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;">Workforce Staff</div>
+          <div style="font-size: 26px; font-weight: 800; color: #0f172a;" id="statTotalEmployees">--</div>
+        </div>
+      </div>
+
+      <div class="admin-metric-card">
+        <div class="admin-metric-icon" style="background: #f3e8ff; color: #9333ea;">🏢</div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;">Active Departments</div>
+          <div style="font-size: 26px; font-weight: 800; color: #0f172a;" id="statTotalDepartments">--</div>
+        </div>
+      </div>
+
+      <div class="admin-metric-card">
+        <div class="admin-metric-icon" style="background: #fef3c7; color: #d97706;">🕒</div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;">Today's Attendance</div>
+          <div style="font-size: 26px; font-weight: 800; color: #0f172a;" id="statAttendanceRate">--%</div>
+        </div>
+      </div>
+
+      <div class="admin-metric-card">
+        <div class="admin-metric-icon" style="background: #dcfce7; color: #16a34a;">✅</div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;">Present Today</div>
+          <div style="font-size: 26px; font-weight: 800; color: #16a34a;" id="statPresentToday">--</div>
+        </div>
+      </div>
+
+      <div class="admin-metric-card">
+        <div class="admin-metric-icon" style="background: #fee2e2; color: #dc2626;">❌</div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;">Absent / Leave</div>
+          <div style="font-size: 26px; font-weight: 800; color: #dc2626;" id="statAbsentToday">--</div>
+        </div>
+      </div>
+
+      <div class="admin-metric-card">
+        <div class="admin-metric-icon" style="background: #f1f5f9; color: #475569;">📬</div>
+        <div>
+          <div style="font-size: 12px; font-weight: 600; color: #64748b; text-transform: uppercase;">Pending Inquiries</div>
+          <div style="font-size: 26px; font-weight: 800; color: #0f172a;" id="statPendingInquiries">--</div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="admin-card" id="panelUsers">
+      <div class="admin-card-header">
+        <div>
+          <h2 class="admin-card-title">
+            <span>👥 Registered User Accounts</span>
+          </h2>
+          <span style="font-size: 13px; color: #64748b;">Live authenticated user accounts in PostgreSQL</span>
+        </div>
+        <div>
+          <a href="roles-permissions.html" class="btn btn-outline" style="padding:6px 14px; font-size:13px; border-color:#0284c7; color:#0284c7; font-weight:700; display:inline-flex; align-items:center; gap:6px;">
+            <span>🛡️</span> Manage Roles &amp; Permissions Matrix &rarr;
+          </a>
+        </div>
+      </div>
+      
+      <div class="table-responsive" style="border: none;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Account Holder</th>
+              <th>Work Email</th>
+              <th>Assigned Role</th>
+              <th>Department</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="registeredUsersTableBody">
+            <!-- Dynamically populated from /api/auth/users -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="admin-card" id="panelEmployees">
+      <div class="admin-card-header">
+        <h2 class="admin-card-title">
+          <span>👔 Company Workforce Directory</span>
+        </h2>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <input type="text" id="adminEmpSearchInput" placeholder="Filter workforce..." style="padding: 7px 12px; font-size: 13px; border: 1.5px solid var(--admin-border); border-radius: 6px; min-width: 200px;">
+          <a href="/api/reports/employees/csv" class="btn btn-outline" style="padding: 7px 14px; font-size: 13px;">📥 Export CSV</a>
+          <button type="button" class="btn btn-primary" id="openAddEmpFromAdminBtn" style="padding: 7px 14px; font-size: 13px;">+ Add Employee</button>
+        </div>
+      </div>
+
+      <div class="table-responsive" style="border: none;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Employee Name &amp; Code</th>
+              <th>Job Title</th>
+              <th>Department</th>
+              <th>Work Email</th>
+              <th>Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminEmployeesTableBody">
+            <!-- Dynamically populated from /api/employees -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div class="admin-card" id="panelAttendance">
+      <div class="admin-card-header">
+        <div>
+          <h2 class="admin-card-title">
+            <span>🕒 Employee Attendance History &amp; Shift Logs</span>
+          </h2>
+          <p style="font-size: 13px; color: #64748b; margin-top: 3px; margin-bottom: 0;">
+            Real-time daily punch-in, punch-out, and attendance status for all company personnel.
+          </p>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 8px; background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 8px; padding: 4px 12px;">
+            <span style="font-size: 12px; font-weight: 700; color: #475569;">Admin Shift:</span>
+            <span id="adminLiveClockDisplay" style="font-family: monospace; font-size: 13px; font-weight: 700; color: #1e293b;">--:--:--</span>
+            <button type="button" id="adminPunchClockBtn" class="btn btn-primary" style="padding: 5px 12px; font-size: 12px; display: flex; align-items: center; gap: 4px;">
+              <span id="adminPunchIcon">🟢</span>
+              <span id="adminPunchText">Punch In</span>
+            </button>
+          </div>
+          <a href="/api/reports/attendance/csv" class="btn btn-outline" id="exportAdminAttendanceCsvBtn" style="padding: 7px 14px; font-size: 13px;">
+            📥 Export Attendance CSV
+          </a>
+        </div>
+      </div>
+
+      <!-- Filter Controls Bar -->
+      <div style="background-color: #f8fafc; padding: 14px 24px; border-bottom: 1px solid var(--admin-border); display: flex; gap: 12px; flex-wrap: wrap; align-items: center; justify-content: space-between;">
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
+          <select id="adminAttStaffSelect" class="form-select" style="padding: 7px 12px; font-size: 13px; min-width: 210px;">
+            <option value="ALL">👤 All Staff Members</option>
+          </select>
+
+          <select id="adminAttDeptFilter" class="form-select" style="padding: 7px 12px; font-size: 13px; width: auto;">
+            <option value="ALL">🏢 All Departments</option>
+          </select>
+
+          <select id="adminAttStatusFilter" class="form-select" style="padding: 7px 12px; font-size: 13px; width: auto;">
+            <option value="ALL">🏷️ All Statuses</option>
+            <option value="Present">Present Only</option>
+            <option value="WFH">WFH (Remote) Only</option>
+            <option value="On Leave">On Leave Only</option>
+            <option value="Absent">Absent Only</option>
+          </select>
+
+          <select id="adminAttDateFilter" class="form-select" style="padding: 7px 12px; font-size: 13px; width: auto;">
+            <option value="ALL">📅 All Dates</option>
+            <option value="TODAY">Today Only</option>
+          </select>
+        </div>
+
+        <div>
+          <input type="text" id="adminAttSearchInput" placeholder="Search name, email..." style="padding: 7px 12px; font-size: 13px; border: 1.5px solid var(--admin-border); border-radius: 6px; min-width: 200px;">
+        </div>
+      </div>
+
+      <div id="adminAttSummaryBanner" style="display: none; background: #eff6ff; padding: 10px 24px; border-bottom: 1px solid #bfdbfe; font-size: 13px; color: #1e40af; align-items: center; justify-content: space-between;">
+        <span id="adminAttSummaryText">Showing attendance records...</span>
+        <button type="button" class="btn-site-link" id="clearStaffFilterBtn" style="color: #2563eb; font-size: 12px; font-weight: 700; cursor: pointer; border: none; background: transparent;">✕ Reset Filter</button>
+      </div>
+
+      <div class="table-responsive" style="border: none; max-height: 480px; overflow-y: auto;">
+        <table class="data-table">
+          <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
+            <tr>
+              <th>Date</th>
+              <th>Employee Name &amp; Email</th>
+              <th>Department</th>
+              <th>Punch In</th>
+              <th>Punch Out</th>
+              <th>Work Hours</th>
+              <th>Status</th>
+              <th style="text-align: right;">Status Override &amp; Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminAttendanceHistoryTableBody">
+            <!-- Dynamically populated from /api/attendance/all -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- =======================================================
+         PANEL 4: DEPARTMENT MANAGEMENT (STEP 8)
+         ======================================================= -->
+    <div class="admin-card" id="panelDepartments">
+      <div class="admin-card-header">
+        <div>
+          <h2 class="admin-card-title">
+            <span>🏢 Department Management</span>
+          </h2>
+          <p style="font-size: 13px; color: #64748b; margin-top: 3px; margin-bottom: 0;">
+            Create organizational units, assign leadership, and manage member allocation.
+          </p>
+        </div>
+        <button type="button" class="btn btn-primary" id="openAddDeptModalBtn" style="padding: 7px 14px; font-size: 13px;">
+          + Add New Department
+        </button>
+      </div>
+
+      <div class="table-responsive" style="border: none;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Department Name</th>
+              <th>Code</th>
+              <th>Department Head</th>
+              <th>Description</th>
+              <th>Workforce Count</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminDepartmentsTableBody">
+            <!-- Dynamically populated from /api/departments -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- =======================================================
+         PANEL 5: CMS PAGE & WEBSITE CONTENT MANAGEMENT (STEP 10 & 11)
+         ======================================================= -->
+    <div class="admin-card" id="panelCms">
+      <div class="admin-card-header">
+        <div>
+          <h2 class="admin-card-title">
+            <span>📝 CMS Page &amp; Website Content Management</span>
+          </h2>
+          <p style="font-size: 13px; color: #64748b; margin-top: 3px; margin-bottom: 0;">
+            Update live website headings, announcements, about mission, metrics and contact details.
+          </p>
+        </div>
+        <span style="font-size: 12px; color: #16a34a; font-weight: 700; background: #dcfce7; padding: 4px 10px; border-radius: 6px;">
+          Live Content Sync Active
+        </span>
+      </div>
+
+      <div class="admin-card-body">
+        <div class="cms-editor-grid">
+          
+          <!-- Box 1: Hero Section -->
+          <div class="cms-editor-box">
+            <div class="cms-box-header">
+              <span>🌟 Hero Section Content</span>
+              <button type="button" class="btn btn-primary btn-sm" id="saveCmsHeroBtn">Save Hero</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">Main Heading</label>
+              <input type="text" id="cmsEditHeroTitle" class="form-control" placeholder="Hero title">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Subtitle Text</label>
+              <textarea id="cmsEditHeroSubtitle" class="form-control" rows="3" placeholder="Hero subtitle description"></textarea>
+            </div>
+          </div>
+
+          <!-- Box 2: About Us & Metrics -->
+          <div class="cms-editor-box">
+            <div class="cms-box-header">
+              <span>📖 About Us &amp; Metrics</span>
+              <button type="button" class="btn btn-primary btn-sm" id="saveCmsAboutBtn">Save About</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">Section Title</label>
+              <input type="text" id="cmsEditAboutTitle" class="form-control" placeholder="About title">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">Mission Description</label>
+              <textarea id="cmsEditAboutSubtitle" class="form-control" rows="2" placeholder="About description"></textarea>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px;">
+              <div>
+                <label class="form-label" style="font-size: 11px;">Companies</label>
+                <input type="text" id="cmsEditCompanies" class="form-control" placeholder="500+">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 11px;">Employees</label>
+                <input type="text" id="cmsEditEmployees" class="form-control" placeholder="50k+">
+              </div>
+              <div>
+                <label class="form-label" style="font-size: 11px;">Uptime</label>
+                <input type="text" id="cmsEditUptime" class="form-control" placeholder="99.9%">
+              </div>
+            </div>
+          </div>
+
+          <!-- Box 3: Contact Details -->
+          <div class="cms-editor-box">
+            <div class="cms-box-header">
+              <span>📍 Headquarters &amp; Support Info</span>
+              <button type="button" class="btn btn-primary btn-sm" id="saveCmsContactBtn">Save Contact</button>
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">Office Address</label>
+              <input type="text" id="cmsEditAddress" class="form-control" placeholder="Corporate address">
+            </div>
+            <div class="form-group" style="margin-bottom: 12px;">
+              <label class="form-label">Support Email</label>
+              <input type="email" id="cmsEditEmail" class="form-control" placeholder="contact@company.com">
+            </div>
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label">Telephone</label>
+              <input type="text" id="cmsEditPhone" class="form-control" placeholder="+91 (0120) ...">
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- =======================================================
+         PANEL 6: CONTACT INQUIRIES & MESSAGES INBOX (STEP 12)
+         ======================================================= -->
+    <div class="admin-card" id="panelInquiries">
+      <div class="admin-card-header">
+        <div>
+          <h2 class="admin-card-title">
+            <span>📬 Contact Inquiries &amp; Messages Inbox</span>
+          </h2>
+          <p style="font-size: 13px; color: #64748b; margin-top: 3px; margin-bottom: 0;">
+            Direct inquiries and support messages submitted through the website contact form.
+          </p>
+        </div>
+        <button type="button" class="btn btn-outline" id="refreshInquiriesBtn" style="padding: 7px 14px; font-size: 13px;">
+          🔄 Refresh
+        </button>
+      </div>
+
+      <div class="table-responsive" style="border: none;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Sender</th>
+              <th>Email</th>
+              <th>Subject</th>
+              <th>Message</th>
+              <th>Status</th>
+              <th style="text-align: right;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminInquiriesTableBody">
+            <!-- Dynamically populated from /api/contacts -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- =========================================================
+       MODAL 1: ADD EMPLOYEE (FROM ADMIN DASHBOARD)
+       ========================================================= -->
+  <div class="modal-backdrop" id="adminAddEmpModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add Employee Record</h3>
+        <button class="modal-close" id="closeAdminAddEmpModal">&times;</button>
+      </div>
+      
+      <form id="adminAddEmpForm" class="modal-form">
+        <div class="form-group">
+          <label class="form-label" for="adminNewEmpName">Full Name</label>
+          <input type="text" id="adminNewEmpName" class="form-control" placeholder="Enter full name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminNewEmpDept">Department</label>
+          <select id="adminNewEmpDept" class="form-select" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminNewEmpTitle">Role in Department / Designation</label>
+          <select id="adminNewEmpTitle" class="form-select" required>
+            <!-- Populated dynamically based on chosen department -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminNewEmpEmail">Work Email</label>
+          <input type="email" id="adminNewEmpEmail" class="form-control" placeholder="employee@company.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminNewEmpPhone">Contact Phone</label>
+          <input type="text" id="adminNewEmpPhone" class="form-control" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="modal-footer" style="padding-top: 10px;">
+          <button type="button" class="btn btn-outline" id="cancelAdminAddEmpBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Employee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 1B: EDIT EMPLOYEE (FROM ADMIN DASHBOARD)
+       ========================================================= -->
+  <div class="modal-backdrop" id="adminEditEmpModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Edit Employee Record</h3>
+        <button class="modal-close" id="closeAdminEditEmpModal">&times;</button>
+      </div>
+      
+      <form id="adminEditEmpForm" class="modal-form">
+        <input type="hidden" id="adminEditEmpId">
+
+        <div class="form-group">
+          <label class="form-label" for="adminEditEmpName">Full Name</label>
+          <input type="text" id="adminEditEmpName" class="form-control" placeholder="Enter full name" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminEditEmpDept">Department</label>
+          <select id="adminEditEmpDept" class="form-select" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminEditEmpTitle">Role in Department / Designation</label>
+          <select id="adminEditEmpTitle" class="form-select" required>
+            <!-- Populated dynamically based on chosen department -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminEditEmpEmail">Work Email</label>
+          <input type="email" id="adminEditEmpEmail" class="form-control" placeholder="employee@company.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminEditEmpPhone">Phone Number</label>
+          <input type="text" id="adminEditEmpPhone" class="form-control" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminEditEmpStatus">Employment Status</label>
+          <select id="adminEditEmpStatus" class="form-select">
+            <option value="Active">Active</option>
+            <option value="On Leave">On Leave</option>
+            <option value="Inactive">Inactive</option>
+          </select>
+        </div>
+
+        <div class="modal-footer" style="padding-top: 10px;">
+          <button type="button" class="btn btn-outline" id="cancelAdminEditEmpBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Update Employee</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 1C: CHANGE USER ROLE & DEPARTMENT (FROM ADMIN DASHBOARD)
+       ========================================================= -->
+  <div class="modal-backdrop" id="adminChangeUserRoleModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Change User Role &amp; Permissions</h3>
+        <button class="modal-close" id="closeAdminChangeUserRoleModal">&times;</button>
+      </div>
+      
+      <form id="adminChangeUserRoleForm" class="modal-form">
+        <input type="hidden" id="adminChangeUserEmail">
+
+        <div class="form-group">
+          <label class="form-label">User Account</label>
+          <input type="text" id="adminChangeUserNameDisplay" class="form-control" readonly style="background: #f1f5f9; font-weight: 600;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminChangeUserRoleSelect">System Authorization Role</label>
+          <select id="adminChangeUserRoleSelect" class="form-select" required>
+            <option value="ROLE_ADMIN">ADMIN (Full Administrative Control)</option>
+            <option value="ROLE_HR_MANAGER">HR MANAGER (Human Resources &amp; Shifts)</option>
+            <option value="ROLE_MANAGER">MANAGER (Departmental Team Oversight)</option>
+            <option value="ROLE_USER">EMPLOYEE (Standard Staff Shift Access)</option>
+            <option value="ROLE_VIEWER">VIEWER (Auditor &amp; Read-Only Access)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminChangeUserDeptSelect">Assigned Department</label>
+          <select id="adminChangeUserDeptSelect" class="form-select" required>
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminChangeUserTitleSelect">Role in Department / Designation</label>
+          <select id="adminChangeUserTitleSelect" class="form-select" required>
+            <!-- Populated dynamically based on department -->
+          </select>
+        </div>
+
+        <div class="modal-footer" style="padding-top: 10px;">
+          <button type="button" class="btn btn-outline" id="cancelAdminChangeUserRoleBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Role &amp; Permissions</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 2: ADD DEPARTMENT (FROM ADMIN DASHBOARD)
+       ========================================================= -->
+  <div class="modal-backdrop" id="adminAddDeptModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title">Add New Department</h3>
+        <button class="modal-close" id="closeAdminAddDeptModal">&times;</button>
+      </div>
+      
+      <form id="adminAddDeptForm" class="modal-form">
+        <div class="form-group">
+          <label class="form-label" for="adminNewDeptName">Department Name</label>
+          <input type="text" id="adminNewDeptName" class="form-control" placeholder="e.g. Artificial Intelligence" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminNewDeptCode">Department Code</label>
+          <input type="text" id="adminNewDeptCode" class="form-control" placeholder="e.g. AI-01" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminNewDeptHead">Head of Department</label>
+          <input type="text" id="adminNewDeptHead" class="form-control" placeholder="e.g. Lead Research Scientist" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminNewDeptDesc">Description</label>
+          <textarea id="adminNewDeptDesc" class="form-control" rows="3" placeholder="Describe the core domain of this department" required></textarea>
+        </div>
+
+        <div class="modal-footer" style="padding-top: 10px;">
+          <button type="button" class="btn btn-outline" id="cancelAdminAddDeptBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Department</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 5: ADMIN ATTENDANCE FORCE PUNCH OUT FOR EMPLOYEE
+       ========================================================= -->
+  <div class="modal-backdrop" id="adminPunchOutModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header" style="border-bottom: 1px solid #fed7aa; background: #fff7ed;">
+        <h3 class="modal-title" style="color: #c2410c; display: flex; align-items: center; gap: 8px;">
+          <span>🚪 Admin Shift Punch Out</span>
+        </h3>
+        <button class="modal-close" id="closeAdminPunchOutModal">&times;</button>
+      </div>
+
+      <form id="adminPunchOutForm" class="modal-form">
+        <input type="hidden" id="adminPunchOutRecordId">
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px 16px; margin-bottom: 16px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 13px; color: #64748b;">Employee Name:</span>
+            <strong id="adminPunchOutEmpName" style="color: #0f172a; font-size: 13px;">-</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 13px; color: #64748b;">Shift Date:</span>
+            <span id="adminPunchOutShiftDate" style="background: #e0f2fe; color: #0369a1; font-weight: 700; font-size: 12px; padding: 2px 8px; border-radius: 4px;">-</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="font-size: 13px; color: #64748b;">Punch In Time:</span>
+            <code id="adminPunchOutTimeIn" style="font-weight: 700; color: #15803d; font-size: 13px;">--:--</code>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminPunchOutTimeInput">
+            Punch Out Time <span style="color: #ef4444;">*</span>
+          </label>
+          <input type="text" id="adminPunchOutTimeInput" class="form-control" placeholder="e.g. 06:00:00 PM" required>
+          <p style="font-size: 11.5px; color: #64748b; margin-top: 5px; margin-bottom: 8px;">
+            ℹ️ Jis date ko employee ne punch in kiya tha (<strong id="adminPunchOutDateNote"></strong>), usi date ke shift record par punch out save hoga.
+          </p>
+
+          <!-- Quick presets -->
+          <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+            <button type="button" class="btn btn-outline btn-sm" onclick="setPresetPunchOut('05:00:00 PM')">05:00 PM</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setPresetPunchOut('05:30:00 PM')">05:30 PM</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setPresetPunchOut('06:00:00 PM')">06:00 PM</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setPresetPunchOut('06:30:00 PM')">06:30 PM</button>
+            <button type="button" class="btn btn-outline btn-sm" onclick="setPresetPunchOut('NOW')">Current Time</button>
+          </div>
+        </div>
+
+        <div class="modal-footer" style="padding-top: 14px;">
+          <button type="button" class="btn btn-outline" id="cancelAdminPunchOutBtn">Cancel</button>
+          <button type="submit" class="btn btn-primary" style="background: #ea580c; border-color: #ea580c; color: #fff;">
+            Confirm Punch Out
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="js/admin.js"></script>
+</body>
+</html>

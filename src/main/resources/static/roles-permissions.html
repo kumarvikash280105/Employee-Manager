@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Role &amp; Permission Studio | EmpManage Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    :root {
+      --admin-bg: #f8fafc;
+      --admin-surface: #ffffff;
+      --admin-border: #e2e8f0;
+      --admin-header-bg: #0b1a30;
+      --admin-header-surface: #112240;
+      --primary-blue: #0284c7;
+      --primary-hover: #0369a1;
+      --navy-dark: #0f172a;
+    }
+
+    body.admin-body {
+      background-color: var(--admin-bg);
+      color: #1e293b;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Top Navigation Header */
+    /* Top Navigation Header */
+    .admin-header {
+      background-color: #0f172a;
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .admin-nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      padding: 0 16px;
+      width: 100%;
+      max-width: 100%;
+      box-sizing: border-box;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      flex-shrink: 0 !important;
+    }
+
+    .admin-nav-pills {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      background: #1e293b;
+      padding: 3px 4px;
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      flex-shrink: 1;
+      min-width: 0;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+
+    .admin-nav-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .admin-nav-pill {
+      color: #94a3b8;
+      text-decoration: none;
+      padding: 5px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .admin-nav-pill:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .admin-nav-pill.active {
+      color: #ffffff;
+      background: #0284c7;
+      font-weight: 700;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
+    }
+
+    .admin-user-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-shrink: 0 !important;
+      margin-left: auto;
+      padding-right: 2px;
+    }
+
+    .admin-user-info {
+      text-align: right;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .admin-user-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #f8fafc;
+      white-space: nowrap;
+    }
+
+    .admin-user-role-tag {
+      font-size: 10.5px;
+      color: #38bdf8;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .admin-btn-dashboard {
+      color: #e2e8f0;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid #334155;
+      padding: 5px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 6px;
+      text-decoration: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0 !important;
+    }
+
+    .admin-btn-dashboard:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #475569;
+      color: #ffffff;
+    }
+
+    .admin-btn-logout {
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #ef4444;
+      border: 1px solid #dc2626;
+      color: #ffffff;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0 !important;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .admin-btn-logout:hover {
+      background: #dc2626;
+    }
+
+    /* Main Container */
+    .admin-container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 24px 28px 60px;
+      flex: 1;
+    }
+
+    /* Page Header */
+    .page-header-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .page-title-wrap h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      color: var(--navy-dark);
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .page-title-wrap p {
+      margin: 4px 0 0;
+      font-size: 13.5px;
+      color: #64748b;
+    }
+
+    /* KPI Metrics Ribbon */
+    .metrics-ribbon {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .metric-pill-card {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .metric-pill-card:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .metric-icon-box {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .metric-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--navy-dark);
+      line-height: 1.2;
+    }
+
+    .metric-lbl {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 1px;
+    }
+
+    /* Workspace Tabs Navigation */
+    .workspace-tabs-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e2e8f0;
+      overflow-x: auto;
+    }
+
+    .workspace-tab-btn {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      padding: 12px 20px;
+      font-size: 14.5px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      margin-bottom: -2px;
+      white-space: nowrap;
+    }
+
+    .workspace-tab-btn:hover {
+      color: var(--primary-blue);
+    }
+
+    .workspace-tab-btn.active {
+      color: var(--primary-blue);
+      border-bottom-color: var(--primary-blue);
+    }
+
+    .workspace-tab-btn .tab-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: #f1f5f9;
+      color: #475569;
+    }
+
+    .workspace-tab-btn.active .tab-badge {
+      background: #e0f2fe;
+      color: var(--primary-blue);
+    }
+
+    /* Studio Layout: Split Screen */
+    .studio-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 24px;
+      align-items: start;
+    }
+
+    @media (max-width: 1024px) {
+      .studio-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Studio Sidebar (Roles List) */
+    .studio-sidebar {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      overflow: hidden;
+    }
+
+    .sidebar-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--admin-border);
+      background: #f8fafc;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .sidebar-header h2 {
+      margin: 0;
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--navy-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sidebar-search-wrap {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--admin-border);
+      background: #ffffff;
+    }
+
+    .sidebar-roles-list {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: calc(100vh - 350px);
+      overflow-y: auto;
+    }
+
+    .role-card-item {
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1.5px solid transparent;
+      background: #f8fafc;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .role-card-item:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      transform: translateY(-1px);
+    }
+
+    .role-card-item.active {
+      background: #f0f9ff;
+      border-color: #38bdf8;
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+    }
+
+    .role-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .role-card-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--navy-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .role-card-item.active .role-card-title {
+      color: #0284c7;
+    }
+
+    .role-card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .badge-system {
+      background: #eff6ff;
+      color: #1d4ed8;
+      border: 1px solid #bfdbfe;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-custom {
+      background: #f0fdf4;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+      font-size: 10.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* Studio Editor (Right Panel) */
+    .studio-editor {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      overflow: hidden;
+    }
+
+    .editor-hero {
+      background: linear-gradient(135deg, #0b1a30 0%, #1e3a8a 100%);
+      color: #ffffff;
+      padding: 22px 26px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .editor-role-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .editor-role-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .editor-role-name {
+      font-size: 20px;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .editor-role-code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      background: rgba(0, 0, 0, 0.25);
+      color: #93c5fd;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .editor-role-desc {
+      font-size: 13px;
+      color: #cbd5e1;
+      margin-top: 4px;
+      max-width: 600px;
+      line-height: 1.4;
+    }
+
+    .editor-actions-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    /* Toolbar Bar */
+    .editor-toolbar {
+      padding: 14px 24px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-stats {
+      font-size: 13.5px;
+      color: #475569;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toolbar-stats strong {
+      color: #0284c7;
+      font-size: 15px;
+    }
+
+    .toolbar-btns {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* =========================================================
+       PERMISSION MATRIX TABLE & DATA TABLE STYLES
+       ========================================================= */
+    .modules-container {
+      padding: 20px 24px;
+      overflow-x: auto;
+    }
+
+    .matrix-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+
+    .matrix-table thead th {
+      background: #f8fafc;
+      color: #334155;
+      font-size: 12px;
+      font-weight: 700;
+      padding: 12px 14px;
+      border-bottom: 2px solid var(--admin-border);
+      border-right: 1px solid var(--admin-border);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .matrix-table thead th:last-child {
+      border-right: none;
+    }
+
+    .matrix-table tbody tr {
+      transition: background 0.15s ease;
+    }
+
+    .matrix-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .matrix-table tbody tr:not(:last-child) td {
+      border-bottom: 1px solid var(--admin-border);
+    }
+
+    .matrix-table tbody td {
+      padding: 12px 14px;
+      border-right: 1px solid var(--admin-border);
+      vertical-align: middle;
+    }
+
+    .matrix-table tbody td:last-child {
+      border-right: none;
+    }
+
+    .matrix-module-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .matrix-module-icon {
+      font-size: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .matrix-module-name {
+      font-weight: 700;
+      color: var(--navy-dark);
+      font-size: 13.5px;
+      line-height: 1.25;
+    }
+
+    .matrix-module-sub {
+      font-size: 11.5px;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    .matrix-cell {
+      text-align: center;
+      transition: all 0.18s ease;
+    }
+
+    .matrix-cell.granted {
+      background: rgba(240, 253, 244, 0.7);
+    }
+
+    .matrix-checkbox-wrap {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      user-select: none;
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.15s ease;
+    }
+
+    .matrix-checkbox-wrap:hover {
+      background: #ffffff;
+      border-color: #cbd5e1;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .matrix-cell.granted .matrix-checkbox-wrap {
+      border-color: #bbf7d0;
+      background: #ffffff;
+    }
+
+    .matrix-checkbox {
+      width: 17px;
+      height: 17px;
+      accent-color: #0284c7;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .matrix-action-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .matrix-cell.granted .matrix-action-name {
+      color: #15803d;
+      font-weight: 700;
+    }
+
+    .matrix-cell.na {
+      background: #fafafa;
+      cursor: default;
+    }
+
+    .na-dash {
+      color: #cbd5e1;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .matrix-row-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      flex-wrap: nowrap;
+    }
+
+    .matrix-badge {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 12px;
+      background: #e0f2fe;
+      color: #0284c7;
+      white-space: nowrap;
+    }
+
+    .btn-matrix-quick {
+      padding: 3px 8px;
+      font-size: 11.5px;
+      font-weight: 700;
+      border: 1px solid #cbd5e1;
+      border-radius: 5px;
+      background: #ffffff;
+      color: #0284c7;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-matrix-quick:hover {
+      background: #0284c7;
+      color: #ffffff;
+      border-color: #0284c7;
+    }
+
+    .btn-matrix-quick.clear {
+      color: #64748b;
+    }
+
+    .btn-matrix-quick.clear:hover {
+      background: #64748b;
+      color: #ffffff;
+      border-color: #64748b;
+    }
+
+    .col-head-title {
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .col-toggle-btn {
+      margin-top: 4px;
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      color: #0284c7;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .col-toggle-btn:hover {
+      background: #e0f2fe;
+    }
+
+    /* Detailed Module Table Format */
+    .detailed-module-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border: 1px solid var(--admin-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    }
+
+    .detailed-module-table thead th {
+      background: #f8fafc;
+      padding: 10px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      border-bottom: 1px solid var(--admin-border);
+      text-align: left;
+    }
+
+    .detailed-module-table tbody td {
+      padding: 11px 14px;
+      border-bottom: 1px solid var(--admin-border);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .detailed-module-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .detailed-module-table tbody tr:hover {
+      background: #f8fafc;
+    }
+
+    .detailed-module-table tbody tr.row-granted {
+      background: rgba(240, 253, 244, 0.4);
+    }
+
+    .view-mode-toggle {
+      display: flex;
+      align-items: center;
+      background: #e2e8f0;
+      padding: 3px;
+      border-radius: 8px;
+      gap: 2px;
+    }
+
+    .view-mode-btn {
+      background: none;
+      border: none;
+      padding: 5px 11px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #475569;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .view-mode-btn.active {
+      background: #ffffff;
+      color: #0284c7;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+    .cap-status-pill {
+      font-size: 10.5px;
+      font-weight: 800;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      display: inline-block;
+    }
+
+    .cap-status-pill.granted {
+      background: #dcfce7;
+      color: #15803d;
+      border: 1px solid #bbf7d0;
+    }
+
+    .cap-status-pill.restricted {
+      background: #f1f5f9;
+      color: #94a3b8;
+      border: 1px solid #e2e8f0;
+    }
+
+    /* Bottom Save Bar */
+    .editor-footer-save {
+      padding: 16px 24px;
+      background: #f8fafc;
+      border-top: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    /* User Role Assignments View */
+    .users-view-card {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      overflow: hidden;
+    }
+
+    .users-view-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .users-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Audit Logs View */
+    .audit-view-card {
+      background: var(--admin-surface);
+      border: 1px solid var(--admin-border);
+      border-radius: 14px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+      overflow: hidden;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 26, 48, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.25s ease;
+      padding: 20px;
+    }
+
+    .modal-backdrop.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: 14px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--admin-border);
+      overflow: hidden;
+      transform: translateY(15px);
+      transition: transform 0.25s ease;
+    }
+
+    .modal-backdrop.open .modal-box {
+      transform: translateY(0);
+    }
+
+    .modal-box-header {
+      padding: 18px 24px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-box-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 800;
+      color: var(--navy-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-close-modal {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: #64748b;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .btn-close-modal:hover {
+      color: #0f172a;
+    }
+
+    .modal-box-body {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .modal-box-footer {
+      padding: 16px 24px;
+      background: #f8fafc;
+      border-top: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Common Form Controls */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 12.5px;
+      font-weight: 700;
+      color: #334155;
+    }
+
+    .form-control {
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 13.5px;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      font-family: inherit;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    }
+
+    /* Toast Notifications */
+    #toastContainer {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 3000;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast-msg {
+      background: #0f172a;
+      color: #ffffff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-size: 13.5px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      border-left: 4px solid var(--primary-blue);
+      animation: slideIn 0.25s ease-out;
+    }
+
+    .toast-msg.success { border-left-color: #10b981; }
+    .toast-msg.error { border-left-color: #ef4444; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- =========================================================
+       ADMIN HEADER & TOP NAVIGATION
+       ========================================================= -->
+  <header class="admin-header">
+    <div class="admin-nav-container">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="brand-logo" style="display:flex; align-items:center; gap:10px; text-decoration:none;">
+        <svg class="logo-icon" viewBox="0 0 42 32" fill="none" style="width:28px; height:28px;">
+          <circle cx="21" cy="9" r="6" fill="#ffffff" />
+          <path d="M7 29c0-6 6-10 14-10s14 4 14 10" fill="#38bdf8" />
+        </svg>
+        <span style="font-size: 18px; font-weight: 800; color: #ffffff;">EmpManage</span>
+      </a>
+
+      <!-- Navigation Pills (Logical Sequence: Workforce -> Attendance -> Departments -> Accounts -> Roles & Permissions -> CMS -> Inquiries) -->
+      <nav class="admin-nav-pills">
+        <a href="admin.html#panelEmployees" class="admin-nav-pill">
+          <span>👥 Workforce</span>
+        </a>
+        <a href="admin.html#panelAttendance" class="admin-nav-pill">
+          <span>⏱️ Attendance</span>
+        </a>
+        <a href="admin.html#panelDepartments" class="admin-nav-pill">
+          <span>🏢 Departments</span>
+        </a>
+        <a href="admin.html#panelUsers" class="admin-nav-pill">
+          <span>👤 Accounts</span>
+        </a>
+        <a href="roles-permissions.html" class="admin-nav-pill active">
+          <span>🛡️ Roles &amp; Permissions</span>
+        </a>
+        <a href="admin.html#panelCms" class="admin-nav-pill">
+          <span>🌐 Website CMS</span>
+        </a>
+        <a href="admin.html#panelInquiries" class="admin-nav-pill">
+          <span>✉️ Inquiries</span>
+        </a>
+      </nav>
+
+      <!-- Admin Profile & Dashboard Back Link -->
+      <div class="admin-user-block">
+        <div class="admin-user-info">
+          <div class="admin-user-name" id="adminHeaderName">System Administrator</div>
+          <div class="admin-user-role-tag">Super Admin</div>
+        </div>
+        <a href="admin.html" class="admin-btn-dashboard">
+          &larr; Admin Dashboard
+        </a>
+        <button type="button" class="admin-btn-logout" id="adminLogoutBtn">
+          Logout
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- =========================================================
+       MAIN CONTENT CONTAINER
+       ========================================================= -->
+  <main class="admin-container">
+
+    <!-- Page Header & Action Buttons -->
+    <div class="page-header-row">
+      <div class="page-title-wrap">
+        <h1><span>🛡️</span> Role &amp; Permission Studio</h1>
+        <p>Design enterprise role policies, toggle granular module capabilities, and assign workforce access controls.</p>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <button type="button" class="btn btn-primary" id="btnOpenCreateRoleModal" style="padding:9px 18px; font-size:13.5px; display:inline-flex; align-items:center; gap:8px; border-radius:8px; background:#0284c7; border-color:#0284c7; font-weight:700; cursor:pointer;">
+          <span>➕</span> New Custom Role
+        </button>
+        <button type="button" class="btn btn-outline" id="btnOpenAssignUserModal" style="padding:9px 16px; font-size:13.5px; display:inline-flex; align-items:center; gap:8px; border-color:#0284c7; color:#0284c7; border-radius:8px; font-weight:700; cursor:pointer;">
+          <span>👤</span> Assign Role to User
+        </button>
+        <button type="button" class="btn btn-outline" id="btnRefreshData" style="padding:9px 14px; font-size:14px; color:#475569; border-radius:8px; cursor:pointer;" title="Refresh Data">
+          🔄
+        </button>
+      </div>
+    </div>
+
+    <!-- 4 High-Value KPI Cards -->
+    <div class="metrics-ribbon">
+      <div class="metric-pill-card">
+        <div class="metric-icon-box" style="background:#e0f2fe; color:#0284c7;">🛡️</div>
+        <div>
+          <div class="metric-val" id="statTotalRoles">5</div>
+          <div class="metric-lbl">Active Roles (System &amp; Custom)</div>
+        </div>
+      </div>
+
+      <div class="metric-pill-card">
+        <div class="metric-icon-box" style="background:#dcfce7; color:#16a34a;">🔑</div>
+        <div>
+          <div class="metric-val" id="statTotalPermissions">22</div>
+          <div class="metric-lbl">Granular Permission Keys</div>
+        </div>
+      </div>
+
+      <div class="metric-pill-card">
+        <div class="metric-icon-box" style="background:#ede9fe; color:#7c3aed;">👥</div>
+        <div>
+          <div class="metric-val" id="statAssignedUsers">3</div>
+          <div class="metric-lbl">Assigned User Accounts</div>
+        </div>
+      </div>
+
+      <div class="metric-pill-card">
+        <div class="metric-icon-box" style="background:#fef3c7; color:#d97706;">🔒</div>
+        <div>
+          <div class="metric-val" style="font-size:15px; font-weight:800; color:#0f172a; margin-top:3px;">Spring Security 6</div>
+          <div class="metric-lbl">Method Security (@PreAuthorize)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Workspace Tabs Navigation -->
+    <div class="workspace-tabs-bar">
+      <button type="button" class="workspace-tab-btn active" id="tabBtnStudio" onclick="switchWorkspaceTab('studio')">
+        <span>🛡️ Role &amp; Permission Studio</span>
+        <span class="tab-badge" id="tabRoleCountPill">5 Roles</span>
+      </button>
+      <button type="button" class="workspace-tab-btn" id="tabBtnUsers" onclick="switchWorkspaceTab('users')">
+        <span>👥 User Role Assignments</span>
+        <span class="tab-badge" id="tabUserCountPill">3 Users</span>
+      </button>
+      <button type="button" class="workspace-tab-btn" id="tabBtnAudit" onclick="switchWorkspaceTab('audit')">
+        <span>📜 Security Audit Trail</span>
+      </button>
+    </div>
+
+    <!-- =========================================================
+         WORKSPACE TAB 1: ROLE & PERMISSION STUDIO (DEFAULT)
+         ========================================================= -->
+    <div id="viewWorkspaceStudio" class="workspace-content-pane">
+      <div class="studio-layout">
+        
+        <!-- Left Column: Role Selector List -->
+        <aside class="studio-sidebar">
+          <div class="sidebar-header">
+            <h2><span>👥</span> Role Directory</h2>
+            <button type="button" class="btn btn-outline" onclick="document.getElementById('btnOpenCreateRoleModal').click()" style="padding:4px 10px; font-size:12px; border-color:#0284c7; color:#0284c7; border-radius:6px; font-weight:700;">
+              ➕ New Role
+            </button>
+          </div>
+          <div class="sidebar-search-wrap">
+            <input type="text" id="studioRoleSearchInput" class="form-control" placeholder="Search roles by name..." style="width:100%; box-sizing:border-box; font-size:12.5px;">
+          </div>
+          <div class="sidebar-roles-list" id="studioRolesContainer">
+            <!-- Dynamically populated role cards -->
+          </div>
+        </aside>
+
+        <!-- Right Column: Interactive Permission Studio Editor -->
+        <section class="studio-editor">
+          
+          <!-- Selected Role Hero Banner -->
+          <div class="editor-hero">
+            <div class="editor-role-info">
+              <div class="editor-role-icon" id="studioRoleIcon">🛡️</div>
+              <div>
+                <div class="editor-role-name">
+                  <span id="studioRoleDisplayName">Administrator</span>
+                  <span id="studioRoleTypeBadge" class="badge-system">SYSTEM ROLE</span>
+                  <span class="editor-role-code" id="studioRoleCode">ROLE_ADMIN</span>
+                </div>
+                <div class="editor-role-desc" id="studioRoleDesc">
+                  Full unrestricted administrative control over system data, user accounts, shifts, and security policies.
+                </div>
+              </div>
+            </div>
+
+            <!-- Role Management Actions -->
+            <div class="editor-actions-row" id="studioRoleActionsRow">
+              <!-- Dynamically populated edit / toggle / delete buttons -->
+            </div>
+          </div>
+
+          <!-- Permission Toolbar -->
+          <div class="editor-toolbar">
+            <div class="toolbar-stats">
+              <span>Granted Capabilities:</span>
+              <strong id="studioGrantedStats">22 of 22 Authorized</strong>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <!-- Table Format Switcher -->
+              <div class="view-mode-toggle">
+                <button type="button" class="view-mode-btn active" id="btnViewMatrix" onclick="setStudioTableView('matrix')">
+                  📊 Matrix Table
+                </button>
+                <button type="button" class="view-mode-btn" id="btnViewDetailed" onclick="setStudioTableView('detailed')">
+                  📋 Detailed Table
+                </button>
+              </div>
+
+              <div class="toolbar-btns">
+                <button type="button" class="btn btn-outline" id="btnStudioSelectAll" style="padding:6px 12px; font-size:12.5px; border-radius:6px; cursor:pointer;">
+                  ✓ Select All
+                </button>
+                <button type="button" class="btn btn-outline" id="btnStudioDeselectAll" style="padding:6px 12px; font-size:12.5px; border-radius:6px; cursor:pointer;">
+                  ✗ Clear All
+                </button>
+                <button type="button" class="btn btn-primary" id="btnStudioSaveTop" style="padding:7px 18px; font-size:13px; background:#0284c7; border-color:#0284c7; border-radius:6px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+                  <span>💾</span> Save Changes
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Permission Matrix & Data Table Container -->
+          <div class="modules-container" id="studioModulesContainer">
+            <!-- Dynamically rendered structured permission table -->
+          </div>
+
+          <!-- Bottom Sticky Save Bar -->
+          <div class="editor-footer-save">
+            <div style="font-size:12.5px; color:#64748b; display:flex; align-items:center; gap:8px;">
+              <span>⚡</span>
+              <span>Permissions take effect immediately for all active users upon saving.</span>
+            </div>
+            <button type="button" class="btn btn-primary" id="btnStudioSaveBottom" style="padding:8px 24px; font-size:13.5px; background:#0284c7; border-color:#0284c7; border-radius:8px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:6px;">
+              <span>💾</span> Save Permission Changes
+            </button>
+          </div>
+
+        </section>
+
+      </div>
+    </div>
+
+    <!-- =========================================================
+         WORKSPACE TAB 2: USER ROLE ASSIGNMENTS
+         ========================================================= -->
+    <div id="viewWorkspaceUsers" class="workspace-content-pane" style="display:none;">
+      <section class="users-view-card">
+        <div class="users-view-header">
+          <div>
+            <h2 style="margin:0; font-size:17px; font-weight:800; color:var(--navy-dark); display:flex; align-items:center; gap:8px;">
+              <span>👥</span> Workforce User Role Assignments
+              <span id="usersTableCountBadge" style="font-size:12px; font-weight:700; background:#e0f2fe; color:#0284c7; padding:2px 8px; border-radius:12px;">3 Users</span>
+            </h2>
+            <p style="margin:3px 0 0; font-size:13px; color:#64748b;">
+              Assign or change access roles for registered personnel. Changes synchronize live to user sessions.
+            </p>
+          </div>
+
+          <div class="users-search-bar">
+            <input type="text" id="searchUserInput" class="form-control" placeholder="Search by name, email, department..." style="min-width:260px; font-size:13px;">
+            <select id="filterUserRoleSelect" class="form-control" style="min-width:170px; font-size:13px;">
+              <option value="">All Roles</option>
+              <option value="ROLE_ADMIN">Administrator</option>
+              <option value="ROLE_HR_MANAGER">HR Manager</option>
+              <option value="ROLE_MANAGER">Department Manager</option>
+              <option value="ROLE_USER">Standard Employee</option>
+              <option value="ROLE_VIEWER">Read-Only Viewer</option>
+            </select>
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('btnOpenAssignUserModal').click()" style="padding:7px 16px; font-size:13px; background:#0284c7; border-color:#0284c7; border-radius:8px; font-weight:700; cursor:pointer;">
+              <span>➕</span> Assign Role
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table" style="width:100%; margin:0; border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                <th style="padding:14px 20px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">User Account</th>
+                <th style="padding:14px 20px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">Official Work Email</th>
+                <th style="padding:14px 20px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">Department</th>
+                <th style="padding:14px 20px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:center;">Assigned Role Policy</th>
+                <th style="padding:14px 20px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:center;">Granted Privileges</th>
+                <th style="padding:14px 20px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:right;">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="userRoleAssignmentsTableBody">
+              <tr>
+                <td colspan="6" style="text-align:center; padding:30px; color:#94a3b8;">
+                  Loading registered user accounts...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <!-- =========================================================
+         WORKSPACE TAB 3: SECURITY AUDIT TRAIL
+         ========================================================= -->
+    <div id="viewWorkspaceAudit" class="workspace-content-pane" style="display:none;">
+      <section class="audit-view-card">
+        <div style="padding:18px 24px; border-bottom:1px solid var(--admin-border); display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+          <div>
+            <h2 style="margin:0; font-size:17px; font-weight:800; color:var(--navy-dark); display:flex; align-items:center; gap:8px;">
+              <span>📜</span> Security &amp; Access Governance Audit Trail
+            </h2>
+            <p style="margin:3px 0 0; font-size:13px; color:#64748b;">
+              Immutable audit log of all role creations, edits, status toggles, and user reassignments.
+            </p>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <input type="text" id="searchAuditInput" class="form-control" placeholder="Filter audit records..." style="min-width:240px; font-size:13px;">
+            <button type="button" class="btn btn-outline" id="btnRefreshAudit" style="padding:7px 14px; font-size:13px; border-radius:8px; cursor:pointer;">
+              🔄 Refresh Log
+            </button>
+          </div>
+        </div>
+
+        <div style="overflow-x:auto;">
+          <table class="table" style="width:100%; margin:0; border-collapse:collapse;">
+            <thead>
+              <tr style="background:#f8fafc; border-bottom:1px solid #e2e8f0;">
+                <th style="padding:12px 18px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">Timestamp</th>
+                <th style="padding:12px 18px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">Action</th>
+                <th style="padding:12px 18px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">Target Role / User</th>
+                <th style="padding:12px 18px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">Performed By</th>
+                <th style="padding:12px 18px; font-size:12px; text-transform:uppercase; color:#64748b; text-align:left;">Details</th>
+              </tr>
+            </thead>
+            <tbody id="auditLogTableBody">
+              <tr>
+                <td colspan="5" style="text-align:center; padding:30px; color:#94a3b8;">
+                  Loading security audit trail...
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+  </main>
+
+  <!-- =========================================================
+       MODAL 1: CREATE NEW ROLE
+       ========================================================= -->
+  <div class="modal-backdrop" id="createRoleModalBackdrop">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3><span>➕</span> Create New Custom Role</h3>
+        <button type="button" class="btn-close-modal" id="btnCloseCreateRoleModal">&times;</button>
+      </div>
+      <form id="createRoleForm">
+        <div class="modal-box-body">
+          <div class="form-group">
+            <label for="newRoleDisplayName">Role Display Name *</label>
+            <input type="text" id="newRoleDisplayName" class="form-control" placeholder="e.g. Finance Auditor, Compliance Officer" required>
+          </div>
+
+          <div class="form-group">
+            <label for="newRoleIdentifier">System Code / Identifier (Optional)</label>
+            <input type="text" id="newRoleIdentifier" class="form-control" placeholder="e.g. ROLE_FINANCE_AUDITOR (auto-generated if empty)">
+            <small style="color:#64748b; font-size:11.5px;">Will be automatically formatted with ROLE_ prefix.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="newRoleDescription">Role Description</label>
+            <textarea id="newRoleDescription" class="form-control" rows="3" placeholder="Describe the operational responsibilities of this role..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="newRoleActive" checked style="accent-color:#0284c7; width:16px; height:16px;">
+              <span>Active (Immediately available for user assignment)</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-box-footer">
+          <button type="button" class="btn btn-outline" id="btnCancelCreateRole" style="padding:8px 16px; border-radius:6px; cursor:pointer;">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitCreateRole" style="background:#0284c7; border-color:#0284c7; padding:8px 20px; border-radius:6px; font-weight:700; cursor:pointer;">
+            Create Role
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 2: EDIT ROLE DETAILS
+       ========================================================= -->
+  <div class="modal-backdrop" id="editRoleModalBackdrop">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3><span>✏️</span> Edit Role Details</h3>
+        <button type="button" class="btn-close-modal" id="btnCloseEditRoleModal">&times;</button>
+      </div>
+      <form id="editRoleForm">
+        <input type="hidden" id="editRoleId">
+        <div class="modal-box-body">
+          <div class="form-group">
+            <label for="editRoleIdentifier">Role Identifier (System Key)</label>
+            <input type="text" id="editRoleIdentifier" class="form-control" readonly style="background:#f1f5f9; color:#64748b; font-family:'JetBrains Mono', monospace;">
+          </div>
+
+          <div class="form-group">
+            <label for="editRoleDisplayName">Display Name *</label>
+            <input type="text" id="editRoleDisplayName" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="editRoleDescription">Description</label>
+            <textarea id="editRoleDescription" class="form-control" rows="3"></textarea>
+          </div>
+
+          <div class="form-group" id="editRoleActiveGroup">
+            <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
+              <input type="checkbox" id="editRoleActive" style="accent-color:#0284c7; width:16px; height:16px;">
+              <span>Active Status</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-box-footer">
+          <button type="button" class="btn btn-outline" id="btnCancelEditRole" style="padding:8px 16px; border-radius:6px; cursor:pointer;">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitEditRole" style="background:#0284c7; border-color:#0284c7; padding:8px 20px; border-radius:6px; font-weight:700; cursor:pointer;">
+            Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL 3: ASSIGN ROLE TO USER
+       ========================================================= -->
+  <div class="modal-backdrop" id="assignUserRoleModalBackdrop">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3><span>👤</span> Assign Role to User</h3>
+        <button type="button" class="btn-close-modal" id="btnCloseAssignUserModal">&times;</button>
+      </div>
+      <form id="assignUserRoleForm">
+        <div class="modal-box-body">
+          <div class="form-group">
+            <label for="assignSelectUser">Select User Account *</label>
+            <select id="assignSelectUser" class="form-control" required>
+              <option value="">-- Choose User Account --</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="assignSelectRole">Assign Role Policy *</label>
+            <select id="assignSelectRole" class="form-control" required>
+              <option value="">-- Choose Role Policy --</option>
+            </select>
+            <small style="color:#64748b; font-size:11.5px;">User session permissions will synchronize live immediately.</small>
+          </div>
+        </div>
+
+        <div class="modal-box-footer">
+          <button type="button" class="btn btn-outline" id="btnCancelAssignUser" style="padding:8px 16px; border-radius:6px; cursor:pointer;">Cancel</button>
+          <button type="submit" class="btn btn-primary" id="btnSubmitAssignUser" style="background:#0284c7; border-color:#0284c7; padding:8px 20px; border-radius:6px; font-weight:700; cursor:pointer;">
+            Assign Role
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Floating Toast Notifications Container -->
+  <div id="toastContainer"></div>
+
+  <!-- Script: roles-permissions.js -->
+  <script src="js/roles-permissions.js"></script>
+</body>
+</html>

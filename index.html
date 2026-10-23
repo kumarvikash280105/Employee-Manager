@@ -1,0 +1,1340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmpManage - Employee Management System</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Caveat:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav-container">
+      <a href="#home" class="brand-logo">
+        <svg class="logo-icon" viewBox="0 0 42 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="21" cy="9" r="6" fill="#ffffff" />
+          <path d="M12 26C12 21 16 17 21 17C26 17 30 21 30 26H12Z" fill="#ffffff" />
+          <circle cx="10" cy="12" r="4.5" fill="#38bdf8" />
+          <path d="M4 26C4 22 7.2 19 11 19H12.5C10.5 20.8 9.5 23.2 9.5 26H4Z" fill="#38bdf8" />
+          <circle cx="32" cy="12" r="4.5" fill="#38bdf8" />
+          <path d="M38 26C38 22 34.8 19 31 19H29.5C31.5 20.8 32.5 23.2 32.5 26H38Z" fill="#38bdf8" />
+        </svg>
+        <span class="logo-text">Emp<span class="text-primary">Manage</span></span>
+      </a>
+      <nav class="nav-menu" id="navMenu">
+        <ul class="nav-list">
+          <li><a href="#home" class="nav-link active">Home</a></li>
+          <li><a href="#employees" class="nav-link" id="navLinkEmployees">Employees</a></li>
+          <li><a href="#departments" class="nav-link">Departments</a></li>
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions" id="authActionsContainer">
+        <!-- Logged Out State: Login & Register Buttons -->
+        <button type="button" class="btn btn-login" id="openAuthBtn" onclick="openAuthModal('login')">
+          <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+          </svg>
+          <span>Login</span>
+        </button>
+
+        <!-- Admin Portal Direct Login Button in navbar -->
+        <button type="button" class="btn-nav-admin" id="openAdminLoginNavBtn" onclick="openAuthModal('admin')" title="Access Enterprise Admin Portal">
+          <span>🛡️ Admin Portal</span>
+        </button>
+
+        <button type="button" class="btn-nav-register" id="openRegisterNavBtn" onclick="openAuthModal('register')">
+          <span>Register</span>
+        </button>
+
+        <!-- Logged In State User Badge -->
+        <div id="navbarUserBadge" class="user-profile-badge" style="display: none; cursor: pointer;" onclick="openUserRoleModal()" title="Click to check your role and granted permissions">
+          <div class="user-avatar-circle" id="navbarUserAvatar">U</div>
+          <div class="user-meta">
+            <span class="user-name-txt" id="navbarUserName">User</span>
+            <span class="user-role-badge" id="navbarUserRole">STAFF</span>
+          </div>
+        </div>
+
+        <!-- Admin Portal Direct Link for Admins -->
+        <a href="admin.html" id="navbarAdminLink" class="btn-nav-admin" style="display: none;">
+          <span>🛡️ Admin Portal</span>
+        </a>
+
+        <!-- My Role Check Option -->
+        <button type="button" class="btn-nav-role" id="navbarRoleBtn" onclick="openUserRoleModal()" title="View your verified enterprise role and access permissions" style="display: none;">
+          <span>🛡️ My Role:</span>
+          <span class="role-pill" id="navbarRolePill">STAFF</span>
+        </button>
+
+        <!-- Attendance Button -->
+        <button type="button" class="btn-nav-attendance" id="navbarAttendanceBtn" onclick="openAttendanceTracker()" style="display: none;">
+          <span>⏱️ Attendance</span>
+        </button>
+
+        <!-- Logout Button -->
+        <button type="button" class="btn-nav-logout" id="navbarLogoutBtn" style="display: none;">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+            <polyline points="16 17 21 12 16 7"></polyline>
+            <line x1="21" y1="12" x2="9" y2="12"></line>
+          </svg>
+          <span>Logout</span>
+        </button>
+
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle navigation menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+
+      <!-- Instant inline sync to avoid flicker / layout shift on refresh -->
+      <script>
+        (function() {
+          try {
+            var u = JSON.parse(localStorage.getItem('empmanage_session_user') || 'null');
+            if (u && u.email) {
+              var b1 = document.getElementById('openAuthBtn');
+              var b2 = document.getElementById('openRegisterNavBtn');
+              var b3 = document.getElementById('openAdminLoginNavBtn');
+              var bd = document.getElementById('navbarUserBadge');
+              var nm = document.getElementById('navbarUserName');
+              var av = document.getElementById('navbarUserAvatar');
+              var rl = document.getElementById('navbarUserRole');
+              var ad = document.getElementById('navbarAdminLink');
+              var at = document.getElementById('navbarAttendanceBtn');
+              var rb = document.getElementById('navbarRoleBtn');
+              var lg = document.getElementById('navbarLogoutBtn');
+              var isAdmin = (u.role === 'ROLE_ADMIN' || u.role === 'ADMIN');
+              if (b1) b1.style.display = 'none';
+              if (b2) b2.style.display = 'none';
+              if (b3) b3.style.display = 'none';
+              if (bd) bd.style.display = 'inline-flex';
+              if (nm) nm.textContent = u.fullName || u.email.split('@')[0];
+              if (av) {
+                av.textContent = (u.fullName || u.email || 'U').charAt(0).toUpperCase();
+                av.style.backgroundColor = isAdmin ? '#dc2626' : 'var(--primary)';
+              }
+              if (rl) {
+                rl.textContent = u.displayRole ? u.displayRole.toUpperCase() : (isAdmin ? 'ADMIN' : 'STAFF');
+                rl.style.color = isAdmin ? '#f87171' : '#38bdf8';
+              }
+              if (ad) ad.style.display = isAdmin ? 'inline-flex' : 'none';
+              if (rb) {
+                rb.style.display = 'inline-flex';
+                var rp = document.getElementById('navbarRolePill');
+                if (rp) {
+                  rp.textContent = isAdmin ? 'ADMIN' : (u.role === 'ROLE_HR_MANAGER' ? 'HR MGR' : (u.role === 'ROLE_MANAGER' ? 'MANAGER' : (u.role === 'ROLE_VIEWER' ? 'VIEWER' : 'STAFF')));
+                  rp.style.backgroundColor = isAdmin ? '#dc2626' : (u.role === 'ROLE_HR_MANAGER' ? '#7c3aed' : (u.role === 'ROLE_MANAGER' ? '#4338ca' : (u.role === 'ROLE_VIEWER' ? '#d97706' : '#0284c7')));
+                }
+              }
+              if (at) at.style.display = 'inline-flex';
+              if (lg) lg.style.display = 'inline-flex';
+            }
+          } catch(e) {}
+        })();
+      </script>
+
+    </div>
+  </header>
+
+  <main>
+    <section class="hero-section" id="home">
+      <div class="container hero-container">
+        <div class="hero-content">
+          <div class="eyebrow-tag">WELCOME TO</div>
+          <h1 class="hero-title" id="cmsHeroTitle">Employee<br>Management System</h1>
+          <p class="hero-subtitle" id="cmsHeroSubtitle">
+            Manage your employees, departments and attendance in one place. 
+            A simple and efficient solution for modern workplaces.
+          </p>
+          
+          <div class="hero-buttons">
+            <a href="#employees" class="btn btn-primary" id="cmsHeroCtaBtn">
+              <svg class="btn-icon" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+              </svg>
+              <span>Get Started</span>
+            </a>
+            <a href="#about" class="btn btn-outline">
+              <span>Learn More</span>
+              <span class="arrow-icon">&rarr;</span>
+            </a>
+          </div>
+        </div>
+        <div class="hero-visual">
+          <div class="hero-image-wrapper">
+            <img 
+              src="assets/images/hero-office.jpg" 
+              alt="EmpManage workspace with laptop" 
+              class="hero-img"
+              onerror="this.src='assets/images/desk-laptop.jpg'"
+            >
+          </div>
+        </div>
+
+      </div>
+      <div class="container" style="margin-top: 70px;">
+        <div class="section-header text-center">
+          <div class="eyebrow-tag">OUR FEATURES</div>
+          <h2 class="section-title">What We Offer</h2>
+          <p class="section-subtitle">
+            Explore the key features of our Employee Management System
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <article class="feature-card interactive-feature-card" id="featureCardEmployees" onclick="navigateToSection('employees')">
+            <div class="card-icon-wrapper icon-blue">
+              <svg viewBox="0 0 24 24" fill="currentColor" class="card-icon" aria-hidden="true">
+                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 3s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+              </svg>
+            </div>
+            <h3 class="card-title" id="featureCardEmpTitle">Employee Management</h3>
+            <p class="card-description" id="featureCardEmpDesc">
+              Add, update, view and manage employee details easily.
+            </p>
+            <a href="#employees" class="card-link" onclick="event.stopPropagation(); navigateToSection('employees');">
+              <span id="featureCardEmpLinkText">Go to Employees</span>
+              <span class="arrow">&rarr;</span>
+            </a>
+          </article>
+          <article class="feature-card interactive-feature-card" id="featureCardAttendance" onclick="openAttendanceTracker()">
+            <div class="card-icon-wrapper icon-green">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="card-icon" aria-hidden="true">
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+                <path d="M9 16l2 2 4-4"></path>
+              </svg>
+            </div>
+            <h3 class="card-title">Attendance Tracking</h3>
+            <p class="card-description">
+              Track employee attendance and leave records efficiently.
+            </p>
+            <a href="javascript:void(0)" class="card-link" onclick="event.stopPropagation(); openAttendanceTracker();">
+              <span>View System</span>
+              <span class="arrow">&rarr;</span>
+            </a>
+          </article>
+          <article class="feature-card interactive-feature-card" id="featureCardDepartments" onclick="navigateToSection('departments')">
+            <div class="card-icon-wrapper icon-purple">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="card-icon" aria-hidden="true">
+                <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
+                <path d="M9 22v-4h6v4"></path>
+                <circle cx="8" cy="6" r="1"></circle>
+                <circle cx="12" cy="6" r="1"></circle>
+                <circle cx="16" cy="6" r="1"></circle>
+                <circle cx="8" cy="10" r="1"></circle>
+                <circle cx="12" cy="10" r="1"></circle>
+                <circle cx="16" cy="10" r="1"></circle>
+                <circle cx="8" cy="14" r="1"></circle>
+                <circle cx="12" cy="14" r="1"></circle>
+                <circle cx="16" cy="14" r="1"></circle>
+              </svg>
+            </div>
+            <h3 class="card-title">Department Management</h3>
+            <p class="card-description">
+              Organize and manage departments with ease.
+            </p>
+            <a href="#departments" class="card-link" onclick="event.stopPropagation(); navigateToSection('departments');">
+              <span>Go to Departments</span>
+              <span class="arrow">&rarr;</span>
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+    <section class="page-section section-employees" id="employees">
+      <div class="container">
+        
+        <div class="section-header flex-header" id="workforceHeader">
+          <div>
+            <div class="eyebrow-tag" id="workforceEyebrow">WORKFORCE DIRECTORY</div>
+            <h2 class="section-title" id="workforceTitle">Employee Directory</h2>
+            <p class="section-subtitle" id="workforceSubtitle">
+              Browse, search, and view company employees and personnel in real-time
+            </p>
+          </div>
+        </div>
+
+        <!-- VIEW 1: Logged-in Regular Employee Personal Profile View (Only logged-in employee's own record shown) -->
+        <div id="employeePersonalView" style="display: none;">
+          <div class="alert-info-box" style="margin-bottom: 24px; padding: 14px 18px; border-radius: 8px; background: #f0fdf4; border: 1px solid #bbf7d0; display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 22px;">🛡️</span>
+            <div style="font-size: 13.5px; color: #166534; line-height: 1.5;">
+              <strong>Personal Employee View:</strong> Showing only your verified company workforce profile. In accordance with enterprise privacy standards, company-wide employee directory browsing and management is restricted to the <strong>Admin Portal</strong>.
+            </div>
+          </div>
+
+          <div class="employee-profile-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 32px; max-width: 900px; margin: 0 auto;">
+            <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding-bottom: 24px; margin-bottom: 24px; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 18px;">
+                <div id="empCardAvatar" style="width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #fff; font-size: 24px; font-weight: 700; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(37,99,235,0.25);">
+                  E
+                </div>
+                <div>
+                  <h3 id="empCardName" style="margin: 0; font-size: 22px; font-weight: 700; color: #0f172a;">Employee Name</h3>
+                  <div style="display: flex; align-items: center; gap: 10px; margin-top: 5px;">
+                    <span id="empCardCode" style="font-family: monospace; font-size: 12px; background: #f1f5f9; padding: 3px 8px; border-radius: 4px; color: #475569; font-weight: 600;">EMP-001</span>
+                    <span id="empCardStatus" class="status-badge active" style="font-size: 11px; padding: 3px 10px;">Active</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button type="button" class="btn btn-primary" onclick="openAttendanceTracker()" style="display: inline-flex; align-items: center; gap: 8px;">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                  <span>My Attendance & Punch Clock</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Grid of Details -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 18px;">
+              <div style="background: #f8fafc; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; margin-bottom: 5px;">Designation / Title</div>
+                <div id="empCardTitle" style="font-size: 15px; font-weight: 600; color: #1e293b;">Software Engineer</div>
+              </div>
+              <div style="background: #f8fafc; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; margin-bottom: 5px;">Department</div>
+                <div id="empCardDept" style="font-size: 15px; font-weight: 600; color: #1e293b;">Engineering & Technology</div>
+              </div>
+              <div style="background: #f8fafc; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; margin-bottom: 5px;">Official Work Email</div>
+                <div id="empCardEmail" style="font-size: 15px; font-weight: 600; color: #2563eb; word-break: break-all;">user@company.com</div>
+              </div>
+              <div style="background: #f8fafc; padding: 16px 20px; border-radius: 10px; border: 1px solid #e2e8f0;">
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; font-weight: 600; margin-bottom: 5px;">System Role</div>
+                <div id="empCardRole" style="font-size: 15px; font-weight: 600; color: #1e293b; cursor: pointer;" onclick="openUserRoleModal()" title="Click to view detailed role and privileges">Standard Employee (Staff)</div>
+              </div>
+            </div>
+
+            <!-- Enterprise Access Governance & Privileges Banner -->
+            <div style="margin-top: 20px; background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border: 1px solid #cbd5e1; border-radius: 12px; padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="width: 44px; height: 44px; border-radius: 10px; background: #0284c7; color: #ffffff; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 10px rgba(2,132,199,0.25); flex-shrink: 0;">
+                  🛡️
+                </div>
+                <div>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-weight: 800; color: #0f172a; font-size: 15px;">Enterprise Access &amp; Privileges</span>
+                    <span id="empCardRoleTierBadge" style="background: #e0f2fe; color: #0284c7; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; text-transform: uppercase;">Tier 1 • Staff</span>
+                  </div>
+                  <p style="margin: 3px 0 0; font-size: 12.5px; color: #64748b;">
+                    Assigned policy: <strong id="empCardPolicyName" style="color: #1e293b;">Standard Employee (ROLE_USER)</strong> &bull; Server-Enforced RBAC
+                  </p>
+                </div>
+              </div>
+              <button type="button" class="btn btn-primary btn-sm" onclick="openUserRoleModal()" style="display: inline-flex; align-items: center; gap: 8px; font-weight: 700; padding: 9px 18px; border-radius: 8px; box-shadow: 0 2px 8px rgba(37,99,235,0.25);">
+                <span>🛡️ Inspect My Role &amp; Privileges</span> &rarr;
+              </button>
+            </div>
+
+            <div style="margin-top: 24px; padding-top: 18px; border-top: 1px dashed #e2e8f0; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; font-size: 13px; color: #64748b;">
+              <span>📅 Employment Status: <strong style="color: #10b981;">Verified & Active</strong></span>
+              <span>🔒 To update title, department, or details, please contact your <strong style="color: #0f172a;">Administrator</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW 2: Logged-in Administrator Full Directory View -->
+        <div id="adminDirectoryView" style="display: none;">
+          <div style="margin-bottom: 20px; padding: 16px 20px; border-radius: 10px; background: #eff6ff; border: 1px solid #bfdbfe; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 24px;">👑</span>
+              <div>
+                <div style="font-weight: 700; color: #1e3a8a; font-size: 15px;">Administrator Oversight Active</div>
+                <div style="font-size: 13px; color: #3b82f6;">You have complete administrative oversight over all company workforce records. To add, edit, delete, or manage records, use the Admin Control Center.</div>
+              </div>
+            </div>
+            <a href="admin.html#panelEmployees" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 8px;">
+              <span>Open Admin Control Center</span> &rarr;
+            </a>
+          </div>
+
+          <div class="controls-bar">
+            <div class="search-box">
+              <svg class="search-icon" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/>
+              </svg>
+              <input type="text" id="employeeSearchInput" placeholder="Search by name, role or email...">
+            </div>
+            <div class="filter-box">
+              <select id="departmentFilterSelect" class="form-select">
+                <option value="ALL">All Departments</option>
+                <option value="Engineering">Engineering & Technology</option>
+                <option value="Human Resources">Human Resources (HR)</option>
+                <option value="Sales & Business">Sales & Business Development</option>
+                <option value="Finance & Accounts">Finance & Accounts</option>
+                <option value="Marketing">Marketing & Communications</option>
+                <option value="Operations & QA">Operations & Quality Assurance</option>
+              </select>
+            </div>
+          </div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Employee Name</th>
+                  <th>Role & Title</th>
+                  <th>Department</th>
+                  <th>Work Email</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="employeeTableBody">
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 3: Guest / Unauthenticated Visitor Locked State -->
+        <div id="guestRestrictedView" style="display: block;">
+          <div class="guest-restricted-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.06); padding: 48px 24px; text-align: center; max-width: 650px; margin: 0 auto;">
+            <div style="width: 64px; height: 64px; border-radius: 50%; background: #fee2e2; color: #ef4444; font-size: 28px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto;">
+              🔒
+            </div>
+            <h3 style="font-size: 22px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">Personnel Records Protected</h3>
+            <p style="font-size: 14.5px; color: #64748b; line-height: 1.6; max-width: 500px; margin: 0 auto 24px auto;">
+              Company workforce records and contact profiles are strictly confidential. Please sign in to access your personal employee details, or log in as an administrator.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+              <button type="button" class="btn btn-primary" onclick="openAuthModal('login')">
+                Sign In as Employee / Admin
+              </button>
+              <button type="button" class="btn btn-outline" onclick="openAuthModal('register')">
+                Register New Account
+              </button>
+            </div>
+            <div style="margin-top: 24px; font-size: 12px; color: #94a3b8;">
+              Full workforce directory browsing is strictly reserved for authenticated administrators.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+    <section class="page-section section-departments" id="departments">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <div class="eyebrow-tag">ORGANIZATIONAL UNITS</div>
+          <h2 class="section-title">Department Management</h2>
+          <p class="section-subtitle">
+            Organize departments, manage leadership assignments and track resources
+          </p>
+        </div>
+
+        <!-- Department Cards Grid (Detailed Descriptions for All Major Enterprise Departments) -->
+        <div class="departments-grid" id="departmentsGrid">
+          <!-- Engineering & Technology -->
+          <div class="department-card dept-theme-eng">
+            <div class="dept-header">
+              <div class="dept-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <div class="dept-badge-group">
+                <span class="badge badge-code">ENG-01</span>
+                <span class="badge badge-active">Operational</span>
+              </div>
+            </div>
+            <h3 class="dept-name">Engineering & Technology</h3>
+            <p class="dept-desc">
+              Responsible for the core software architecture, product development, system security, and technical infrastructure.
+            </p>
+            <div class="dept-info-strip">
+              <div class="dept-info-item">
+                <div class="dept-info-icon-badge">👔</div>
+                <div>
+                  <span class="dept-info-label">Division Leadership</span>
+                  <span class="dept-info-value">Lead Software Architect</span>
+                </div>
+              </div>
+            </div>
+            <div class="dept-tags">
+              <span class="dept-tag">Java / Spring Boot</span>
+              <span class="dept-tag">Cloud Architecture</span>
+              <span class="dept-tag">REST APIs</span>
+              <span class="dept-tag">DevOps & CI/CD</span>
+            </div>
+            <div class="dept-footer-bar">
+              <span class="dept-status-indicator">
+                <span class="dot-active"></span> Active Unit
+              </span>
+              <span class="dept-unit-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Core Division
+              </span>
+            </div>
+          </div>
+
+          <!-- Human Resources (HR) -->
+          <div class="department-card dept-theme-hr">
+            <div class="dept-header">
+              <div class="dept-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="9" cy="7" r="4"></circle>
+                  <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                  <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+              </div>
+              <div class="dept-badge-group">
+                <span class="badge badge-code">HR-01</span>
+                <span class="badge badge-active">Operational</span>
+              </div>
+            </div>
+            <h3 class="dept-name">Human Resources (HR)</h3>
+            <p class="dept-desc">
+              Manages people operations, workplace culture, talent acquisition, labor compliance, and staff welfare.
+            </p>
+            <div class="dept-info-strip">
+              <div class="dept-info-item">
+                <div class="dept-info-icon-badge">👔</div>
+                <div>
+                  <span class="dept-info-label">Division Leadership</span>
+                  <span class="dept-info-value">VP of People Operations</span>
+                </div>
+              </div>
+            </div>
+            <div class="dept-tags">
+              <span class="dept-tag">Talent Acquisition</span>
+              <span class="dept-tag">Attendance & Shifts</span>
+              <span class="dept-tag">Employee Welfare</span>
+              <span class="dept-tag">Compliance</span>
+            </div>
+            <div class="dept-footer-bar">
+              <span class="dept-status-indicator">
+                <span class="dot-active"></span> Active Unit
+              </span>
+              <span class="dept-unit-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Core Division
+              </span>
+            </div>
+          </div>
+
+          <!-- Sales & Business -->
+          <div class="department-card dept-theme-sls">
+            <div class="dept-header">
+              <div class="dept-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <line x1="12" y1="1" x2="12" y2="23"></line>
+                  <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                </svg>
+              </div>
+              <div class="dept-badge-group">
+                <span class="badge badge-code">SLS-01</span>
+                <span class="badge badge-active">Operational</span>
+              </div>
+            </div>
+            <h3 class="dept-name">Sales & Business Development</h3>
+            <p class="dept-desc">
+              Drives business revenue generation, enterprise client acquisitions, strategic partnerships, and commercial growth.
+            </p>
+            <div class="dept-info-strip">
+              <div class="dept-info-item">
+                <div class="dept-info-icon-badge">👔</div>
+                <div>
+                  <span class="dept-info-label">Division Leadership</span>
+                  <span class="dept-info-value">Chief Commercial Officer</span>
+                </div>
+              </div>
+            </div>
+            <div class="dept-tags">
+              <span class="dept-tag">B2B Enterprise</span>
+              <span class="dept-tag">Client Partnerships</span>
+              <span class="dept-tag">Revenue Growth</span>
+              <span class="dept-tag">Client Success</span>
+            </div>
+            <div class="dept-footer-bar">
+              <span class="dept-status-indicator">
+                <span class="dot-active"></span> Active Unit
+              </span>
+              <span class="dept-unit-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Core Division
+              </span>
+            </div>
+          </div>
+
+          <!-- Finance & Accounts -->
+          <div class="department-card dept-theme-fin">
+            <div class="dept-header">
+              <div class="dept-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                  <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+              </div>
+              <div class="dept-badge-group">
+                <span class="badge badge-code">FIN-01</span>
+                <span class="badge badge-active">Operational</span>
+              </div>
+            </div>
+            <h3 class="dept-name">Finance & Accounts</h3>
+            <p class="dept-desc">
+              Oversees financial governance, budget planning, statutory tax compliance, corporate ledger auditing, and payroll.
+            </p>
+            <div class="dept-info-strip">
+              <div class="dept-info-item">
+                <div class="dept-info-icon-badge">👔</div>
+                <div>
+                  <span class="dept-info-label">Division Leadership</span>
+                  <span class="dept-info-value">Head of Financial Planning</span>
+                </div>
+              </div>
+            </div>
+            <div class="dept-tags">
+              <span class="dept-tag">Corporate Audits</span>
+              <span class="dept-tag">Payroll Automation</span>
+              <span class="dept-tag">Financial Planning</span>
+              <span class="dept-tag">Taxation</span>
+            </div>
+            <div class="dept-footer-bar">
+              <span class="dept-status-indicator">
+                <span class="dot-active"></span> Active Unit
+              </span>
+              <span class="dept-unit-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Core Division
+              </span>
+            </div>
+          </div>
+
+          <!-- Marketing & Communications -->
+          <div class="department-card dept-theme-mkt">
+            <div class="dept-header">
+              <div class="dept-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                </svg>
+              </div>
+              <div class="dept-badge-group">
+                <span class="badge badge-code">MKT-01</span>
+                <span class="badge badge-active">Operational</span>
+              </div>
+            </div>
+            <h3 class="dept-name">Marketing & Communications</h3>
+            <p class="dept-desc">
+              Spearheads brand awareness, digital marketing campaigns, market research, and multi-channel engagement.
+            </p>
+            <div class="dept-info-strip">
+              <div class="dept-info-item">
+                <div class="dept-info-icon-badge">👔</div>
+                <div>
+                  <span class="dept-info-label">Division Leadership</span>
+                  <span class="dept-info-value">Chief Brand Officer</span>
+                </div>
+              </div>
+            </div>
+            <div class="dept-tags">
+              <span class="dept-tag">Brand Strategy</span>
+              <span class="dept-tag">Performance Growth</span>
+              <span class="dept-tag">Social Engagement</span>
+              <span class="dept-tag">PR & Media</span>
+            </div>
+            <div class="dept-footer-bar">
+              <span class="dept-status-indicator">
+                <span class="dot-active"></span> Active Unit
+              </span>
+              <span class="dept-unit-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Core Division
+              </span>
+            </div>
+          </div>
+
+          <!-- Operations & QA -->
+          <div class="department-card dept-theme-ops">
+            <div class="dept-header">
+              <div class="dept-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                  <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                </svg>
+              </div>
+              <div class="dept-badge-group">
+                <span class="badge badge-code">OPS-01</span>
+                <span class="badge badge-active">Operational</span>
+              </div>
+            </div>
+            <h3 class="dept-name">Operations & QA</h3>
+            <p class="dept-desc">
+              Ensures uninterrupted organizational workflows, SLA governance, process automation, and quality verification.
+            </p>
+            <div class="dept-info-strip">
+              <div class="dept-info-item">
+                <div class="dept-info-icon-badge">👔</div>
+                <div>
+                  <span class="dept-info-label">Division Leadership</span>
+                  <span class="dept-info-value">Director of Quality Assurance</span>
+                </div>
+              </div>
+            </div>
+            <div class="dept-tags">
+              <span class="dept-tag">Quality Assurance</span>
+              <span class="dept-tag">SLA Governance</span>
+              <span class="dept-tag">Process Automation</span>
+              <span class="dept-tag">Delivery QA</span>
+            </div>
+            <div class="dept-footer-bar">
+              <span class="dept-status-indicator">
+                <span class="dot-active"></span> Active Unit
+              </span>
+              <span class="dept-unit-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Core Division
+              </span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+    <section class="page-section section-about" id="about">
+      <div class="container about-container">
+        
+        <!-- Left Column: Office Building Visual -->
+        <div class="about-visual">
+          <div class="building-card">
+            <img 
+              src="assets/images/office-building.jpg" 
+              alt="EmpManage Office Building Headquarters" 
+              class="about-img"
+              onerror="this.src='assets/images/building-hd.jpg'"
+            >
+          </div>
+        </div>
+        <div class="about-content">
+          <div class="eyebrow-tag">ABOUT US</div>
+          <h2 class="about-title" id="cmsAboutTitle">Let's Build a Better Workplace</h2>
+          <p class="about-description" id="cmsAboutDesc">
+            EmpManage is a modern Employee Management System designed to simplify HR operations. 
+            Our platform helps organizations manage employees, departments and attendance efficiently with 
+            cloud scalability and intuitive management workflows.
+          </p>
+
+          <div class="about-features-list">
+            <div class="about-feature-item">
+              <span class="check-bullet">&check;</span>
+              <span><strong>Unified Database:</strong> Centralized employee records and credential tracking.</span>
+            </div>
+            <div class="about-feature-item">
+              <span class="check-bullet">&check;</span>
+              <span><strong>Smart Attendance:</strong> Real-time clock-in and automated leave balance calculators.</span>
+            </div>
+            <div class="about-feature-item">
+              <span class="check-bullet">&check;</span>
+              <span><strong>Role-Based Access:</strong> Clear security boundaries between Admins and Employees.</span>
+            </div>
+          </div>
+          <div class="metrics-row">
+            <div class="metric-box">
+              <span class="metric-num" id="cmsMetricCompanies">500+</span>
+              <span class="metric-txt">Companies</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-num" id="cmsMetricEmployees">50k+</span>
+              <span class="metric-txt">Employees</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-num" id="cmsMetricUptime">99.9%</span>
+              <span class="metric-txt">Uptime SLA</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+    <section class="page-section section-contact" id="contact">
+      <div class="container">
+        
+        <div class="section-header text-center">
+          <div class="eyebrow-tag">GET IN TOUCH</div>
+          <h2 class="section-title" id="cmsContactTitle">Contact Support & Headquarters</h2>
+          <p class="section-subtitle" id="cmsContactSubtitle">
+            Have questions, feedback, or need enterprise support? We are here to help.
+          </p>
+        </div>
+
+        <div class="contact-grid">
+          <div class="contact-cards-stack">
+            <div class="contact-item">
+              <div class="contact-icon-wrapper icon-blue">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="contact-icon" aria-hidden="true">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                </svg>
+              </div>
+              <div class="contact-details">
+                <h4 class="contact-label">Our Address</h4>
+                <p class="contact-value" id="cmsContactAddress">123 Tech Park, Sector 62, Noida, UP - 201301</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon-wrapper icon-green">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="contact-icon" aria-hidden="true">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+              </div>
+              <div class="contact-details">
+                <h4 class="contact-label">Email Us</h4>
+                <p class="contact-value">
+                  <a href="mailto:contact@empmanage.com" id="cmsContactEmail">contact@empmanage.com</a>
+                </p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon-wrapper icon-purple">
+                <svg viewBox="0 0 24 24" fill="currentColor" class="contact-icon" aria-hidden="true">
+                  <path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/>
+                </svg>
+              </div>
+              <div class="contact-details">
+                <h4 class="contact-label">Call Us</h4>
+                <p class="contact-value">
+                  <a href="tel:+9101204567890" id="cmsContactPhone">+91 (0120) 456-7890</a>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div class="contact-form-card">
+            <h3 class="form-heading">Send Us a Direct Message</h3>
+            <form id="contactForm" class="contact-form">
+              <div class="form-row">
+                <div class="form-group">
+                  <label class="form-label" for="contactName">Your Name</label>
+                  <input type="text" id="contactName" class="form-control" placeholder="Enter full name" required>
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="contactEmail">Work Email</label>
+                  <input type="email" id="contactEmail" class="form-control" placeholder="name@company.com" required>
+                </div>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contactSubject">Subject</label>
+                <input type="text" id="contactSubject" class="form-control" placeholder="Inquiry about EmpManage features" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="contactMessage">Message</label>
+                <textarea id="contactMessage" class="form-control" rows="4" placeholder="How can we assist your organization?" required></textarea>
+              </div>
+              <button type="submit" class="btn btn-primary btn-block">Send Message</button>
+            </form>
+          </div> 
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-top">
+        <a href="#home" class="brand-logo footer-logo">
+          <svg class="logo-icon" viewBox="0 0 42 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="21" cy="9" r="6" fill="#ffffff" />
+            <path d="M12 26C12 21 16 17 21 17C26 17 30 21 30 26H12Z" fill="#ffffff" />
+            <circle cx="10" cy="12" r="4.5" fill="#38bdf8" />
+            <path d="M4 26C4 22 7.2 19 11 19H12.5C10.5 20.8 9.5 23.2 9.5 26H4Z" fill="#38bdf8" />
+            <circle cx="32" cy="12" r="4.5" fill="#38bdf8" />
+            <path d="M38 26C38 22 34.8 19 31 19H29.5C31.5 20.8 32.5 23.2 32.5 26H38Z" fill="#38bdf8" />
+          </svg>
+          <span class="logo-text">Emp<span class="text-primary">Manage</span></span>
+        </a>
+        <ul class="footer-nav">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#employees">Employees</a></li>
+          <li><a href="#departments">Departments</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <span class="footer-divider" aria-hidden="true"></span>
+        <div class="footer-socials">
+          <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+            </svg>
+          </a>
+          <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="GitHub">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+          </a>
+          <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Twitter">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+          </a>
+          <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="social-btn" aria-label="Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+          </a>
+        </div>
+
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2026 EmpManage. All rights reserved.</p>
+      </div>
+
+    </div>
+  </footer>
+  <div class="modal-backdrop" id="authModalBackdrop">
+    <div class="modal-dialog auth-dialog">
+      <button class="modal-close" id="closeAuthModal" aria-label="Close modal">&times;</button>
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab-btn active" id="tabLoginBtn" onclick="switchAuthTab('login')">Login</button>
+        <button type="button" class="auth-tab-btn" id="tabRegisterBtn" onclick="switchAuthTab('register')">Register</button>
+      </div>
+      <div class="auth-tab-content active" id="loginTabContent">
+        <div class="modal-header-compact">
+          <h3 class="modal-title">Sign in to EmpManage</h3>
+          <p class="modal-subtitle">Select role: Only <strong>Employee</strong> or <strong>Admin</strong></p>
+        </div>
+        
+        <form id="loginForm" class="modal-form">
+          <div class="form-group">
+            <label class="form-label">Select Role</label>
+            <div class="role-selector">
+              <label class="role-pill">
+                <input type="radio" name="loginRole" id="loginRoleEmployee" value="EMPLOYEE" checked>
+                <span>Employee</span>
+              </label>
+              <label class="role-pill">
+                <input type="radio" name="loginRole" id="loginRoleAdmin" value="ADMIN">
+                <span>Admin</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="loginEmailInput" class="form-label">Work Email / Username</label>
+            <input 
+              type="text" 
+              id="loginEmailInput" 
+              class="form-control" 
+              placeholder="e.g. admin@empmanage.com or admin" 
+              required 
+              autocomplete="username"
+            >
+          </div>
+          <div class="form-group">
+            <label for="loginPasswordInput" class="form-label">Password</label>
+            <input 
+              type="password" 
+              id="loginPasswordInput" 
+              class="form-control" 
+              placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" 
+              required 
+              autocomplete="current-password"
+            >
+          </div>
+
+          <div class="form-options">
+            <label class="checkbox-label">
+              <input type="checkbox" id="rememberMe"> Remember me
+            </label>
+            <a href="javascript:void(0)" class="forgot-link" onclick="showToast('Password reset link sent to work email.')">Forgot password?</a>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="loginSubmitBtn">Login</button>
+
+          <p class="auth-switch-prompt">
+            Don't have an account? <a href="javascript:void(0)" onclick="switchAuthTab('register')">Register Now</a>
+          </p>
+
+          <div class="demo-credentials-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+              <strong style="font-size: 12px; color: var(--text-main);">Demo Accounts (Click to auto-fill):</strong>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+              <button type="button" class="btn-demo-fill" id="fillDemoAdminBtn" onclick="document.getElementById('loginEmailInput').value='admin@empmanage.com'; document.getElementById('loginPasswordInput').value='admin123'; document.getElementById('loginRoleAdmin').checked=true; showToast('Admin credentials filled! Click Sign In', 'info');" style="padding: 8px 10px; font-size: 11.5px; font-weight: 600; background: #eff6ff; color: #1d4ed8; border: 1.5px solid #bfdbfe; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.2s; line-height: 1.35;">
+                🛡️ <strong>Admin</strong><br><span style="font-size: 10px; color: #475569; font-weight: normal;">admin@empmanage.com</span>
+              </button>
+              <button type="button" class="btn-demo-fill" id="fillDemoEmpBtn" onclick="document.getElementById('loginEmailInput').value='employee@empmanage.com'; document.getElementById('loginPasswordInput').value='emp123'; document.getElementById('loginRoleEmployee').checked=true; showToast('Employee credentials filled! Click Sign In', 'info');" style="padding: 8px 10px; font-size: 11.5px; font-weight: 600; background: #f8fafc; color: #334155; border: 1.5px solid #cbd5e1; border-radius: 8px; cursor: pointer; text-align: left; transition: all 0.2s; line-height: 1.35;">
+                👤 <strong>Employee</strong><br><span style="font-size: 10px; color: #64748b; font-weight: normal;">employee@empmanage.com</span>
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="auth-tab-content" id="registerTabContent">
+        <div class="modal-header-compact">
+          <h3 class="modal-title">Register New Account</h3>
+          <p class="modal-subtitle">Create your ID before logging in</p>
+        </div>
+        
+        <form id="registerForm" class="modal-form">
+          <div class="form-group">
+            <label class="form-label">Register As</label>
+            <div class="role-selector">
+              <label class="role-pill">
+                <input type="radio" name="registerRole" value="EMPLOYEE" checked>
+                <span>Employee</span>
+              </label>
+              <label class="role-pill">
+                <input type="radio" name="registerRole" value="ADMIN">
+                <span>Admin</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="regFullName" class="form-label">Full Name</label>
+            <input type="text" id="regFullName" class="form-control" placeholder="Enter full name" required>
+          </div>
+          <div class="form-group">
+            <label for="regEmail" class="form-label">Work Email</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="user@company.com" required>
+          </div>
+          <div class="form-group">
+            <label for="regDepartment" class="form-label">Department</label>
+            <select id="regDepartment" class="form-select" required>
+              <option value="Engineering & Technology">Engineering & Technology</option>
+              <option value="Human Resources (HR)">Human Resources (HR)</option>
+              <option value="Sales & Business">Sales & Business Development</option>
+              <option value="Finance & Accounts">Finance & Accounts</option>
+              <option value="Marketing & Communications">Marketing & Communications</option>
+              <option value="Operations & QA">Operations & Quality Assurance</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="regTitle" class="form-label">Role in Department / Designation</label>
+            <select id="regTitle" class="form-select" required>
+              <!-- Populated dynamically based on selected department -->
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="regPhone" class="form-label">Contact Phone (Optional)</label>
+            <input type="tel" id="regPhone" class="form-control" placeholder="e.g. +91 98765 43210">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="regPassword" class="form-label">Password</label>
+              <input type="password" id="regPassword" class="form-control" placeholder="Min 6 characters" minlength="6" required>
+            </div>
+            <div class="form-group">
+              <label for="regConfirmPassword" class="form-label">Confirm</label>
+              <input type="password" id="regConfirmPassword" class="form-control" placeholder="Re-type password" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="registerSubmitBtn">Register Account</button>
+
+          <p class="auth-switch-prompt">
+            Already registered? <a href="javascript:void(0)" onclick="switchAuthTab('login')">Sign In here</a>
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-backdrop" id="attendanceModalBackdrop" onclick="if(event.target === this) closeAttendanceTrackerFunc()">
+    <div class="modal-dialog attendance-dialog" style="max-width: 740px; width: 95%;">
+      <div class="modal-header">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div class="card-icon-wrapper icon-green" style="width: 44px; height: 44px; margin-bottom: 0;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="22" height="22">
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+              <line x1="16" y1="2" x2="16" y2="6"></line>
+              <line x1="8" y1="2" x2="8" y2="6"></line>
+              <line x1="3" y1="10" x2="21" y2="10"></line>
+              <path d="M9 16l2 2 4-4"></path>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin-bottom: 2px;" id="attModalMainTitle">My Attendance & Shift Clock</h3>
+            <p class="modal-subtitle" id="attModalMainSubtitle">Personal daily punch clock & individual attendance history</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close" id="closeAttendanceModal" onclick="closeAttendanceTrackerFunc()" title="Close">&times;</button>
+      </div>
+      <div class="modal-body" style="padding-top: 4px;">
+        
+        <!-- VIEW 1: NOT LOGGED IN STATE -->
+        <div id="attNotLoggedInView" style="display: none; text-align: center; padding: 36px 20px;">
+          <div style="width: 58px; height: 58px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px;">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+            </svg>
+          </div>
+          <h4 style="font-size: 19px; font-weight: 700; color: var(--text-main); margin-bottom: 8px;">Please Sign In to Access Your Attendance</h4>
+          <p style="font-size: 14.5px; color: var(--text-muted); max-width: 440px; margin: 0 auto 22px; line-height: 1.6;">
+            Attendance is strictly individual. Sign in to your Employee or Admin account to mark your shift and view your personal attendance history.
+          </p>
+          <div style="display: flex; gap: 10px; justify-content: center;">
+            <button type="button" class="btn btn-primary" onclick="closeAttendanceTrackerFunc(); openAuthModal('login');" style="padding: 10px 22px;">
+              Sign In to My Account
+            </button>
+            <button type="button" class="btn btn-outline" onclick="closeAttendanceTrackerFunc(); openAuthModal('register');" style="padding: 10px 20px;">
+              Register New Account
+            </button>
+          </div>
+        </div>
+        <div id="attLoggedInView">
+          
+          <!-- User Profile & Shift Info Bar -->
+          <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div id="attUserAvatarCircle" style="width: 42px; height: 42px; border-radius: 50%; background: #3b82f6; color: #ffffff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">
+                U
+              </div>
+              <div>
+                <div style="font-size: 15px; font-weight: 700; color: var(--text-main);" id="attUserNameDisplay">User Name</div>
+                <div style="font-size: 12.5px; color: var(--text-muted);">
+                  <span id="attUserEmailDisplay">user@email.com</span> &bull; <span id="attUserDeptDisplay">Department</span>
+                </div>
+              </div>
+            </div>
+            <div>
+              <span id="attUserRoleBadge" class="status-badge" style="background: #e0f2fe; color: #0284c7; font-weight: 700;">EMPLOYEE</span>
+            </div>
+          </div>
+          <div class="attendance-punch-card" style="background: linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 100%); border: 1.5px solid #bbf7d0; border-radius: 12px; padding: 16px 20px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; margin-bottom: 18px;">
+            <div>
+              <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #15803d; margin-bottom: 2px;">Live Digital Clock</div>
+              <div id="liveClockDisplay" style="font-size: 24px; font-weight: 800; font-family: monospace; color: #14532d; letter-spacing: 1px;">--:--:-- --</div>
+              <div id="liveDateDisplay" style="font-size: 12.5px; color: #166534; font-weight: 500;">Loading date...</div>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+              <div style="display: flex; gap: 6px; align-items: center;">
+                <label style="font-size: 12px; font-weight: 600; color: #166534; display: flex; align-items: center; gap: 4px; cursor: pointer;">
+                  <input type="radio" name="attWorkMode" value="Office" checked> 🏢 Office
+                </label>
+                <label style="font-size: 12px; font-weight: 600; color: #166534; display: flex; align-items: center; gap: 4px; cursor: pointer; margin-left: 8px;">
+                  <input type="radio" name="attWorkMode" value="WFH"> 💻 WFH
+                </label>
+                <label style="font-size: 12px; font-weight: 600; color: #166534; display: flex; align-items: center; gap: 4px; cursor: pointer; margin-left: 8px;">
+                  <input type="radio" name="attWorkMode" value="Leave"> 🌴 Leave
+                </label>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-end;">
+                <span id="userPunchBadge" class="status-badge" style="background: #e2e8f0; color: #334155; font-weight: 700; font-size: 11.5px;">Not Punched In</span>
+                <button type="button" class="btn btn-primary" id="punchClockBtn" style="padding: 9px 16px; font-size: 13.5px; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);">
+                  <span id="punchClockIcon">🟢</span>
+                  <span id="punchClockText">Punch In (Clock In)</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top: 18px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--text-main); margin-bottom: 0;">My Shift Attendance History</h4>
+              <span style="font-size: 12px; color: var(--text-muted);">Only your personal records are shown</span>
+            </div>
+            <div class="table-responsive" style="max-height: 240px; overflow-y: auto; border: 1px solid var(--border-color); border-radius: 8px;">
+              <table class="data-table" style="margin-bottom: 0;">
+                <thead style="position: sticky; top: 0; background: #f8fafc; z-index: 2;">
+                  <tr>
+                    <th>Date</th>
+                    <th>Mode</th>
+                    <th>Punch In</th>
+                    <th>Punch Out</th>
+                    <th>Total Hours</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="myAttendanceHistoryTableBody">
+                </tbody>
+              </table>
+            </div>
+
+            <div id="adminPortalPromptNotice" style="display: none; margin-top: 14px; background: #eff6ff; border: 1px dashed #93c5fd; border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: #1e40af; align-items: center; justify-content: space-between;">
+              <span>👑 <strong>Administrator Access:</strong> All company employee records are managed in the Admin Portal.</span>
+              <a href="admin.html" style="font-weight: 700; color: #2563eb; text-decoration: underline;">Open Admin Portal &rarr;</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding-top: 14px; border-top: 1px solid #e2e8f0;">
+        <button type="button" class="btn btn-outline" id="closeAttendanceModalBtn" onclick="closeAttendanceTrackerFunc()">Close Tracker</button>
+      </div>
+
+    </div>
+  </div>
+  <div class="modal-backdrop" id="featureModalBackdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="modal-title" id="featureModalTitle">Feature Overview</h3>
+        <button class="modal-close" id="closeFeatureModal">&times;</button>
+      </div>
+      <div class="modal-body" id="featureModalBody"></div>
+      <div class="modal-footer">
+        <button class="btn btn-outline" id="closeFeatureModalBtn">Close</button>
+        <button class="btn btn-primary" onclick="openLoginDirect()">Go to Portal</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODAL: USER ROLE & ACCESS PRIVILEGES CHECKER (ENTERPRISE IAM)
+       ========================================================= -->
+  <div class="modal-backdrop" id="userRoleModalBackdrop">
+    <div class="modal-dialog role-governance-modal" style="max-width: 740px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #0b1a30 0%, #1e3a8a 100%); color: #ffffff; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 18px 24px;">
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div style="width:40px; height:40px; border-radius:10px; background:rgba(56, 189, 248, 0.2); border: 1px solid rgba(56, 189, 248, 0.4); color:#38bdf8; display:flex; align-items:center; justify-content:center; font-size:22px;">
+            🛡️
+          </div>
+          <div>
+            <h3 class="modal-title" style="margin:0; font-size:18px; font-weight:800; color:#ffffff; letter-spacing: -0.01em;">Enterprise Identity &amp; Role Privileges</h3>
+            <p style="margin:3px 0 0; font-size:12.5px; color:#cbd5e1;">Real-time verified access entitlements and security policy for your session</p>
+          </div>
+        </div>
+        <button class="modal-close" id="closeUserRoleModal" style="color: #cbd5e1; font-size: 26px; line-height: 1;">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 24px; max-height: calc(85vh - 120px); overflow-y: auto;">
+        <!-- 1. Verified Identity Hero Card -->
+        <div class="role-hero-banner">
+          <div class="role-hero-content">
+            <div class="role-hero-avatar-wrap">
+              <div id="modalUserAvatar" class="role-hero-avatar">U</div>
+              <div class="role-hero-status-dot" title="Active Verified Session"></div>
+            </div>
+            <div class="role-hero-details">
+              <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+                <div>
+                  <div class="role-hero-name" id="modalUserFullName">User Full Name</div>
+                  <div class="role-hero-email" id="modalUserEmail">user@company.com</div>
+                </div>
+                <div id="modalUserRoleBadge" class="role-tier-badge" style="background: #e0f2fe; color: #0284c7;">
+                  👑 Super Administrator
+                </div>
+              </div>
+              <div class="role-hero-meta-row">
+                <span class="role-hero-tag">🆔 Employee Code: <strong id="modalUserEmpCode" style="color: #ffffff; font-family: monospace;">EMP-001</strong></span>
+                <span class="role-hero-tag">🏢 <strong id="modalUserDept" style="color: #ffffff;">Engineering</strong></span>
+                <span class="role-hero-tag" style="background: rgba(16, 185, 129, 0.2); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">🟢 <strong id="modalUserSessionStatus">Active Verified Session</strong></span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Role Policy Overview -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 20px; margin-bottom: 20px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em;">Assigned Governance Policy</div>
+            <span style="font-size: 11px; font-weight: 700; color: #0284c7; background: #e0f2fe; padding: 2px 8px; border-radius: 10px;">PostgreSQL RBAC</span>
+          </div>
+          <div id="modalUserRoleDesc" style="font-size: 13.5px; color: #1e293b; line-height: 1.5; font-weight: 500;">
+            Loading your role policy...
+          </div>
+          <div style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e2e8f0; display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: #64748b;">
+            <span>🔒 <strong>Data Scope:</strong> <span id="modalUserScope" style="font-weight: 600; color: #0f172a;">Personal Workforce Scope</span></span>
+            <span>⚡ <strong>Enforcement:</strong> Spring Security 6 Method Security</span>
+            <span>🛡️ <strong>Compliance:</strong> Principle of Least Privilege (PoLP)</span>
+          </div>
+        </div>
+
+        <!-- 3. Granular Privileges Matrix -->
+        <div>
+          <!-- Header and Filter Tabs -->
+          <div class="role-tabs-bar">
+            <span style="font-size: 13px; font-weight: 800; color: #0f172a; margin-right: 8px;">Access Capabilities:</span>
+            <button type="button" class="role-tab-btn active" id="tabFilterAll" onclick="filterRoleCapabilities('ALL')">
+              <span>All Capabilities</span>
+              <span id="tabCountAll" style="font-size: 10.5px; opacity: 0.85;">(19)</span>
+            </button>
+            <button type="button" class="role-tab-btn" id="tabFilterGranted" onclick="filterRoleCapabilities('GRANTED')">
+              <span style="color: #16a34a;">✓</span>
+              <span>Authorized</span>
+              <span id="tabCountGranted" style="font-size: 10.5px; background: #dcfce7; color: #15803d; padding: 1px 6px; border-radius: 10px; font-weight: 800;">(4)</span>
+            </button>
+            <button type="button" class="role-tab-btn" id="tabFilterDenied" onclick="filterRoleCapabilities('DENIED')">
+              <span style="color: #64748b;">🔒</span>
+              <span>Restricted</span>
+              <span id="tabCountDenied" style="font-size: 10.5px; background: #f1f5f9; color: #64748b; padding: 1px 6px; border-radius: 10px; font-weight: 800;">(15)</span>
+            </button>
+          </div>
+
+          <!-- Dynamic Capability Domains Container -->
+          <div id="modalRoleCapabilitiesContainer">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+
+        <!-- 4. Security & Compliance Callout -->
+        <div style="margin-top: 20px; padding: 14px 16px; border-radius: 10px; background: #f0fdf4; border: 1px solid #bbf7d0; display: flex; align-items: flex-start; gap: 12px;">
+          <span style="font-size: 20px; flex-shrink: 0;">🛡️</span>
+          <div style="font-size: 12.5px; color: #166534; line-height: 1.5;">
+            <strong>Server-Enforced Authorization:</strong> Your privileges are verified on the Spring Boot backend on every API request. If you require higher clearance (e.g. shift editing, department management, or user governance), contact your <strong>System Administrator</strong> or <strong>HR Manager</strong>.
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding: 16px 24px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+        <div>
+          <a href="roles-permissions.html" id="modalAdminPortalLink" class="btn btn-outline btn-sm" style="display: none; border-color: #0284c7; color: #0284c7; font-weight: 700; align-items: center; gap: 6px;">
+            <span>🛡️ Open Admin Role &amp; Permission Console</span> &rarr;
+          </a>
+          <span id="modalPoLPNotice" style="font-size: 12px; color: #64748b; display: inline-flex; align-items: center; gap: 5px;">
+            🔒 Principle of Least Privilege (PoLP) Active
+          </span>
+        </div>
+        <button type="button" class="btn btn-primary btn-sm" id="closeUserRoleModalBtn" style="padding: 8px 22px; font-weight: 700;">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- =========================================================
+       MODAL: DEPARTMENT EMPLOYEE ROSTER (ADMIN ONLY)
+       ========================================================= -->
+  <div class="modal-backdrop" id="deptRosterModalBackdrop">
+    <div class="modal-dialog" style="max-width: 650px;">
+      <div class="modal-header" style="background: #f8fafc; border-bottom: 1px solid #e2e8f0;">
+        <div>
+          <h3 class="modal-title" id="deptRosterModalTitle" style="display: flex; align-items: center; gap: 8px;">
+            <span>👥 Department Personnel Roster</span>
+          </h3>
+          <p id="deptRosterModalSubtitle" style="font-size: 12.5px; color: #64748b; margin-top: 3px; margin-bottom: 0;">
+            Only Administrators have permission to view personnel allocated to this department.
+          </p>
+        </div>
+        <button class="modal-close" id="closeDeptRosterModal">&times;</button>
+      </div>
+
+      <div class="modal-body" style="padding: 16px 20px;">
+        <div class="table-responsive" style="max-height: 380px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <table class="data-table" style="width: 100%;">
+            <thead>
+              <tr style="position: sticky; top: 0; background: #f8fafc; z-index: 1;">
+                <th>Employee Name</th>
+                <th>Designation / Role</th>
+                <th>Work Email</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="deptRosterTableBody">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="modal-footer" style="padding-top: 12px; display: flex; justify-content: space-between; align-items: center;">
+        <a href="admin.html#panelEmployees" class="btn btn-outline btn-sm" style="color: var(--primary);">
+          Manage in Admin Portal &rarr;
+        </a>
+        <button type="button" class="btn btn-primary btn-sm" id="closeDeptRosterModalBtn">
+          Close Roster
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+  <script src="js/app.js"></script>
+</body>
+</html>
