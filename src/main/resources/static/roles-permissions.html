@@ -330,6 +330,124 @@
       align-items: start;
     }
 
+    /* Mobile Sub-Navigation Bar */
+    .admin-mobile-subnav {
+      display: none;
+      background: #0b1a30;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 7px 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .admin-mobile-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .admin-mobile-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-nav-pill {
+      color: #94a3b8;
+      text-decoration: none;
+      padding: 6px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+    }
+
+    .mobile-nav-pill:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.12);
+    }
+
+    .mobile-nav-pill.active {
+      color: #ffffff;
+      background: #0284c7;
+      border-color: #0284c7;
+      font-weight: 700;
+      box-shadow: 0 2px 8px rgba(2, 132, 199, 0.35);
+    }
+
+    .mobile-nav-pill.highlight {
+      background: rgba(2, 132, 199, 0.2);
+      color: #38bdf8;
+      border-color: rgba(56, 189, 248, 0.4);
+      font-weight: 700;
+    }
+
+    @media (max-width: 992px) {
+      .admin-nav-pills {
+        display: none !important;
+      }
+      .admin-mobile-subnav {
+        display: block;
+      }
+      .admin-nav-container {
+        height: 54px;
+        padding: 0 12px;
+      }
+      .admin-user-info {
+        display: none;
+      }
+      .admin-btn-dashboard {
+        padding: 4px 8px;
+        font-size: 11px;
+      }
+      .admin-btn-logout {
+        padding: 5px 10px;
+        font-size: 11.5px;
+      }
+      .admin-container {
+        padding: 16px 12px;
+      }
+      .metrics-ribbon {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 10px;
+      }
+      .metric-pill-card {
+        padding: 12px;
+        gap: 10px;
+      }
+      .metric-icon-box {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+      }
+      .editor-hero {
+        padding: 16px 14px;
+        gap: 12px;
+      }
+      .editor-toolbar {
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .modules-container {
+        padding: 14px 10px;
+      }
+      .workspace-tabs-bar {
+        overflow-x: auto;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+
     @media (max-width: 1024px) {
       .studio-layout {
         grid-template-columns: 1fr;
@@ -1128,6 +1246,33 @@
         </button>
       </div>
 
+    </div>
+
+    <!-- Mobile Sub-Navigation Bar (Horizontally scrollable on mobile & tablet <= 992px) -->
+    <div class="admin-mobile-subnav">
+      <nav class="admin-mobile-pills">
+        <a href="admin.html#panelEmployees" class="mobile-nav-pill">
+          <span>👥 Workforce</span>
+        </a>
+        <a href="admin.html#panelAttendance" class="mobile-nav-pill">
+          <span>⏱️ Attendance</span>
+        </a>
+        <a href="admin.html#panelDepartments" class="mobile-nav-pill">
+          <span>🏢 Departments</span>
+        </a>
+        <a href="admin.html#panelUsers" class="mobile-nav-pill">
+          <span>👤 Accounts</span>
+        </a>
+        <a href="roles-permissions.html" class="mobile-nav-pill active highlight">
+          <span>🛡️ Roles &amp; Permissions</span>
+        </a>
+        <a href="admin.html#panelCms" class="mobile-nav-pill">
+          <span>🌐 Website CMS</span>
+        </a>
+        <a href="admin.html#panelInquiries" class="mobile-nav-pill">
+          <span>✉️ Inquiries</span>
+        </a>
+      </nav>
     </div>
   </header>
 

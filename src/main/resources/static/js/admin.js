@@ -78,6 +78,20 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   }
 
+  // Navigation Pill Active State & Smooth Scroll Handling
+  const allNavPills = document.querySelectorAll('.admin-nav-pill, .mobile-nav-pill');
+  allNavPills.forEach(pill => {
+    pill.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        allNavPills.forEach(p => {
+          if (p.getAttribute('href') === href) p.classList.add('active');
+          else if (p.getAttribute('href') && p.getAttribute('href').startsWith('#')) p.classList.remove('active');
+        });
+      }
+    });
+  });
+
   const updateStats = async () => {
     try {
       const res = await fetch(`${API_BASE}/stats`);
