@@ -71,10 +71,13 @@ public class DatabaseConfig {
         config.setUsername(username);
         config.setPassword(password);
         config.setDriverClassName(driverClassName);
-        config.setMaximumPoolSize(10);
+        config.setMaximumPoolSize(8);
         config.setMinimumIdle(2);
         config.setIdleTimeout(30000);
         config.setConnectionTimeout(20000);
+        config.setKeepaliveTime(30000);
+        config.setMaxLifetime(600000);
+        config.setLeakDetectionThreshold(60000);
 
         log.info("Initialized HikariDataSource with target database: {}", jdbcUrl);
         return new HikariDataSource(config);
