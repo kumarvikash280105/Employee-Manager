@@ -103,6 +103,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const roleBtn = document.getElementById('navbarRoleBtn');
     const logoutBtn = document.getElementById('navbarLogoutBtn');
     const navEmp = document.getElementById('navLinkEmployees');
+    const mobileUserSection = document.getElementById('mobileUserSection');
+    const mobileDrawerAvatar = document.getElementById('mobileDrawerAvatar');
+    const mobileDrawerName = document.getElementById('mobileDrawerName');
+    const mobileDrawerEmail = document.getElementById('mobileDrawerEmail');
+    const mobileDrawerRole = document.getElementById('mobileDrawerRole');
+    const mobileDrawerAdminLink = document.getElementById('mobileDrawerAdminLink');
+    const mobileNavAdminWrap = document.querySelector('.mobile-nav-admin-wrap');
 
     if (user && user.email) {
       if (btnAuth) btnAuth.style.display = 'none';
@@ -156,6 +163,25 @@ document.addEventListener('DOMContentLoaded', () => {
       if (attBtn) attBtn.style.display = 'inline-flex';
       if (logoutBtn) logoutBtn.style.display = 'inline-flex';
       if (navEmp) navEmp.textContent = isAdmin ? 'Employees (Admin)' : 'My Profile';
+
+      // Synchronize Mobile Drawer User Card & Actions
+      if (mobileUserSection) mobileUserSection.style.display = 'block';
+      if (mobileDrawerName) mobileDrawerName.textContent = displayName;
+      if (mobileDrawerEmail) mobileDrawerEmail.textContent = user.email || '';
+      if (mobileDrawerAvatar) {
+        mobileDrawerAvatar.textContent = displayName.charAt(0).toUpperCase();
+        mobileDrawerAvatar.style.backgroundColor = isAdmin ? '#dc2626' : 'var(--primary)';
+      }
+      if (mobileDrawerRole) {
+        mobileDrawerRole.textContent = user.displayRole ? user.displayRole.toUpperCase() : (isAdmin ? 'ADMIN' : 'EMPLOYEE');
+        mobileDrawerRole.style.color = isAdmin ? '#f87171' : '#38bdf8';
+      }
+      if (mobileDrawerAdminLink) {
+        mobileDrawerAdminLink.style.display = isAdmin ? 'flex' : 'none';
+      }
+      if (mobileNavAdminWrap) {
+        mobileNavAdminWrap.style.display = 'none';
+      }
     } else {
       if (btnAuth) btnAuth.style.display = 'inline-flex';
       if (btnReg) btnReg.style.display = 'inline-flex';
@@ -166,6 +192,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (attBtn) attBtn.style.display = 'none';
       if (logoutBtn) logoutBtn.style.display = 'none';
       if (navEmp) navEmp.textContent = 'Employees';
+
+      if (mobileUserSection) mobileUserSection.style.display = 'none';
+      if (mobileNavAdminWrap) mobileNavAdminWrap.style.display = '';
     }
 
     if (typeof renderDepartmentsGrid === 'function') {
@@ -1861,6 +1890,23 @@ document.addEventListener('DOMContentLoaded', () => {
   // Mobile Navigation Hamburger Toggle Handling
   const mobileToggle = document.getElementById('mobileToggle');
   const navMenu = document.getElementById('navMenu');
+
+  window.closeMobileMenu = () => {
+    if (navMenu) navMenu.classList.remove('open');
+    if (mobileToggle) mobileToggle.classList.remove('active');
+  };
+
+  window.handleMobileLogout = async () => {
+    window.closeMobileMenu();
+    const user = getCurrentUser();
+    try {
+      await fetch(`${API_BASE}/auth/logout`, { method: 'POST' });
+    } catch (e) {}
+    removeCurrentUser();
+    showToast(`Goodbye, ${user ? user.fullName : 'User'}! You have been signed out.`, 'info');
+    window.closeAttendanceTrackerFunc();
+  };
+
   if (mobileToggle && navMenu) {
     mobileToggle.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -1870,15 +1916,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('click', (e) => {
       if (!navMenu.contains(e.target) && !mobileToggle.contains(e.target)) {
-        navMenu.classList.remove('open');
-        mobileToggle.classList.remove('active');
+        window.closeMobileMenu();
       }
     });
 
-    navMenu.querySelectorAll('.nav-link').forEach(link => {
+    navMenu.querySelectorAll('.nav-link, .mobile-action-pill, .mobile-user-card').forEach(link => {
       link.addEventListener('click', () => {
-        navMenu.classList.remove('open');
-        mobileToggle.classList.remove('active');
+        window.closeMobileMenu();
       });
     });
   }

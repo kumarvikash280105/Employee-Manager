@@ -26,6 +26,47 @@
       </a>
       <nav class="nav-menu" id="navMenu">
         <ul class="nav-list">
+          <!-- Logged In Mobile User Drawer Section (Visible only on mobile phone when logged in) -->
+          <li class="mobile-user-section" id="mobileUserSection" style="display: none;">
+            <div class="mobile-user-card" onclick="openUserRoleModal(); closeMobileMenu();" title="Click to view Account &amp; Attendance History">
+              <div class="mobile-user-card-avatar" id="mobileDrawerAvatar">U</div>
+              <div class="mobile-user-card-info">
+                <div class="mobile-user-card-name" id="mobileDrawerName">User Full Name</div>
+                <div class="mobile-user-card-meta">
+                  <span class="mobile-user-card-role" id="mobileDrawerRole">EMPLOYEE</span>
+                  <span class="mobile-user-card-email" id="mobileDrawerEmail">user@company.com</span>
+                </div>
+              </div>
+              <span class="mobile-user-card-chevron">⚙️</span>
+            </div>
+
+            <div class="mobile-user-actions-grid">
+              <button type="button" class="mobile-action-pill mobile-action-attendance" onclick="openAttendanceTracker(); closeMobileMenu();">
+                <span class="mobile-action-pill-icon">⏱️</span>
+                <span class="mobile-action-pill-text">My Attendance &amp; Shift Clock</span>
+                <span class="mobile-action-pill-arrow">&rarr;</span>
+              </button>
+
+              <button type="button" class="mobile-action-pill mobile-action-role" onclick="openUserRoleModal(); closeMobileMenu();">
+                <span class="mobile-action-pill-icon">🛡️</span>
+                <span class="mobile-action-pill-text">My Role &amp; Access Privileges</span>
+                <span class="mobile-action-pill-arrow">&rarr;</span>
+              </button>
+
+              <a href="admin.html" class="mobile-action-pill mobile-action-admin" id="mobileDrawerAdminLink" style="display: none;">
+                <span class="mobile-action-pill-icon">👑</span>
+                <span class="mobile-action-pill-text">Admin Management Portal</span>
+                <span class="mobile-action-pill-arrow">&rarr;</span>
+              </a>
+
+              <button type="button" class="mobile-action-pill mobile-action-logout" id="mobileDrawerLogoutBtn" onclick="handleMobileLogout();">
+                <span class="mobile-action-pill-icon">🚪</span>
+                <span class="mobile-action-pill-text">Sign Out / Logout</span>
+              </button>
+            </div>
+            <div class="mobile-user-divider"></div>
+          </li>
+
           <li><a href="#home" class="nav-link active">Home</a></li>
           <li><a href="#employees" class="nav-link" id="navLinkEmployees">Employees</a></li>
           <li><a href="#departments" class="nav-link">Departments</a></li>
@@ -140,6 +181,27 @@
               }
               if (at) at.style.display = 'inline-flex';
               if (lg) lg.style.display = 'inline-flex';
+
+              var mus = document.getElementById('mobileUserSection');
+              var mdn = document.getElementById('mobileDrawerName');
+              var mde = document.getElementById('mobileDrawerEmail');
+              var mda = document.getElementById('mobileDrawerAvatar');
+              var mdr = document.getElementById('mobileDrawerRole');
+              var mdal = document.getElementById('mobileDrawerAdminLink');
+              var mnaw = document.querySelector('.mobile-nav-admin-wrap');
+              if (mus) mus.style.display = 'block';
+              if (mdn) mdn.textContent = u.fullName || u.email.split('@')[0];
+              if (mde) mde.textContent = u.email || '';
+              if (mda) {
+                mda.textContent = (u.fullName || u.email || 'U').charAt(0).toUpperCase();
+                mda.style.backgroundColor = isAdmin ? '#dc2626' : 'var(--primary)';
+              }
+              if (mdr) {
+                mdr.textContent = u.displayRole ? u.displayRole.toUpperCase() : (isAdmin ? 'ADMIN' : 'EMPLOYEE');
+                mdr.style.color = isAdmin ? '#f87171' : '#38bdf8';
+              }
+              if (mdal) mdal.style.display = isAdmin ? 'flex' : 'none';
+              if (mnaw) mnaw.style.display = 'none';
             }
           } catch(e) {}
         })();

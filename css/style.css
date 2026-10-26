@@ -477,6 +477,189 @@ button, input, select, textarea {
   transition: var(--transition);
 }
 
+/* =========================================================
+   MOBILE USER DRAWER MENU (POST-LOGIN DEDICATED MOBILE VIEW)
+   ========================================================= */
+.mobile-user-section {
+  display: none;
+  margin-bottom: 14px;
+}
+
+.mobile-user-card {
+  background: linear-gradient(135deg, rgba(30, 58, 138, 0.45) 0%, rgba(15, 23, 42, 0.7) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 12px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.mobile-user-card:hover, .mobile-user-card:active {
+  background: rgba(30, 58, 138, 0.65);
+  border-color: rgba(56, 189, 248, 0.55);
+}
+
+.mobile-user-card-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  font-weight: 800;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.mobile-user-card-info {
+  flex: 1;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.mobile-user-card-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #ffffff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mobile-user-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.mobile-user-card-role {
+  font-size: 10px;
+  font-weight: 800;
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.15);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 1px 6px;
+  border-radius: 4px;
+  text-transform: uppercase;
+}
+
+.mobile-user-card-email {
+  font-size: 11px;
+  color: #94a3b8;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 140px;
+}
+
+.mobile-user-card-chevron {
+  color: #cbd5e1;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.mobile-user-actions-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.mobile-action-pill {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  text-decoration: none;
+}
+
+.mobile-action-pill:hover, .mobile-action-pill:active {
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+.mobile-action-pill-icon {
+  font-size: 18px;
+  width: 24px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.mobile-action-pill-text {
+  flex: 1;
+}
+
+.mobile-action-pill-arrow {
+  font-size: 14px;
+  opacity: 0.65;
+}
+
+.mobile-action-attendance {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.32);
+  color: #a7f3d0;
+}
+.mobile-action-attendance:hover {
+  background: rgba(16, 185, 129, 0.24);
+  color: #ffffff;
+}
+
+.mobile-action-role {
+  background: rgba(56, 189, 248, 0.14);
+  border-color: rgba(56, 189, 248, 0.32);
+  color: #bae6fd;
+}
+.mobile-action-role:hover {
+  background: rgba(56, 189, 248, 0.24);
+  color: #ffffff;
+}
+
+.mobile-action-admin {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.22) 0%, rgba(185, 28, 28, 0.28) 100%);
+  border-color: rgba(239, 68, 68, 0.45);
+  color: #fca5a5;
+}
+.mobile-action-admin:hover {
+  background: rgba(220, 38, 38, 0.35);
+  color: #ffffff;
+}
+
+.mobile-action-logout {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #fca5a5;
+}
+.mobile-action-logout:hover {
+  background: rgba(239, 68, 68, 0.22);
+  color: #ffffff;
+}
+
+.mobile-user-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 12px 0 6px 0;
+}
+
 .hero-section {
   padding: 70px 0 80px;
   background: linear-gradient(180deg, #ffffff 0%, #f9fbfe 100%);
@@ -1746,6 +1929,23 @@ button, input, select, textarea {
   }
 }
 
+@media (min-width: 769px) {
+  .mobile-user-section {
+    display: none !important;
+  }
+
+  .mobile-toggle {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1100px) and (min-width: 769px) {
+  /* On compact laptop screens (1024px), hide redundant role button to keep desktop navbar sleek */
+  #navbarRoleBtn {
+    display: none !important;
+  }
+}
+
 @media (max-width: 768px) {
   .site-header .container {
     padding: 0 12px;
@@ -1758,6 +1958,9 @@ button, input, select, textarea {
 
   .nav-menu {
     top: 60px;
+    max-height: calc(100vh - 60px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .brand-logo .logo-icon {
@@ -1771,6 +1974,44 @@ button, input, select, textarea {
 
   .nav-actions {
     gap: 6px;
+    max-width: 70%;
+    justify-content: flex-end;
+  }
+
+  /* ON MOBILE PHONES: HIDE WIDE DESKTOP INLINE BUTTONS FROM TOP NAVBAR
+     They are cleanly, touch-responsively displayed inside the mobile hamburger menu drawer! */
+  #navbarRoleBtn,
+  #navbarAttendanceBtn,
+  #navbarAdminLink {
+    display: none !important;
+  }
+
+  .user-profile-badge {
+    padding: 3px 8px 3px 4px;
+    gap: 6px;
+    max-width: 125px;
+    box-shadow: none;
+  }
+
+  .user-avatar-circle {
+    width: 26px;
+    height: 26px;
+    font-size: 11.5px;
+  }
+
+  .user-name-txt {
+    max-width: 70px;
+    font-size: 12px;
+  }
+
+  .user-role-badge {
+    display: none !important; /* Hide subtitle role text in top badge on phone */
+  }
+
+  .btn-nav-logout {
+    padding: 5px 9px;
+    font-size: 11.5px;
+    gap: 4px;
   }
 
   .btn-login {
@@ -1832,6 +2073,7 @@ button, input, select, textarea {
 
   .nav-menu {
     top: 56px;
+    max-height: calc(100vh - 56px);
   }
 
   .brand-logo .logo-text {
@@ -1866,33 +2108,59 @@ button, input, select, textarea {
   }
 
   .user-name-txt {
-    max-width: 75px;
-    font-size: 12px;
-  }
-
-  .btn-nav-role {
-    padding: 4px 8px;
-    font-size: 11px;
-  }
-
-  .btn-nav-attendance {
-    padding: 5px 8px;
+    max-width: 58px;
     font-size: 11.5px;
   }
 
   .btn-nav-logout {
-    padding: 5px 8px;
-    font-size: 11.5px;
+    padding: 5px 7px;
+    font-size: 11px;
+  }
+
+  .employee-profile-card {
+    padding: 16px 14px !important;
+  }
+
+  .role-hero-banner {
+    padding: 14px 14px !important;
+  }
+
+  .role-hero-avatar {
+    width: 48px !important;
+    height: 48px !important;
+    font-size: 20px !important;
+  }
+
+  .role-hero-name {
+    font-size: 16px !important;
+  }
+
+  .role-hero-details {
+    min-width: 0 !important;
+    width: 100% !important;
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 420px) {
   .site-header .container {
     padding: 0 6px;
   }
 
   .brand-logo .logo-text {
     font-size: 14.5px;
+  }
+
+  .user-name-txt {
+    max-width: 45px;
+    font-size: 11px;
+  }
+
+  .btn-nav-logout span {
+    display: none; /* Show only logout icon on small phones */
+  }
+
+  .btn-nav-logout {
+    padding: 6px 7px;
   }
 
   .btn-login {
