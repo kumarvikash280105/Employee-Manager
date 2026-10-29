@@ -24,6 +24,16 @@
       --accent-red: #ef4444;
     }
 
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body.task-body {
       background-color: var(--task-bg);
       color: #1e293b;
@@ -799,15 +809,140 @@
       to { transform: translateX(0); opacity: 1; }
     }
 
+    .task-mobile-subnav {
+      display: none;
+      background: #0b1a30;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 7px 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .task-mobile-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .task-mobile-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .task-mobile-pill {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .task-mobile-pill.active {
+      color: #ffffff;
+      background: var(--primary-blue);
+      border-color: var(--primary-blue);
+    }
+
     @media (max-width: 768px) {
-      .task-cards-container {
-        grid-template-columns: 1fr;
+      .task-nav-links {
+        display: none !important;
       }
-      .task-hero {
-        padding: 20px;
+      .task-mobile-subnav {
+        display: block;
       }
       .task-nav-container {
         padding: 0 12px;
+        height: 56px;
+      }
+      .task-main {
+        padding: 16px 12px 36px;
+      }
+      .task-hero {
+        padding: 18px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+      }
+      .task-hero-title {
+        font-size: 20px;
+      }
+      .task-hero-actions {
+        width: 100%;
+      }
+      .task-hero-actions .btn-task-action {
+        flex: 1;
+        justify-content: center;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .kpi-card {
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .kpi-num {
+        font-size: 20px;
+      }
+      .kpi-label {
+        font-size: 11.5px;
+      }
+      .task-toolbar {
+        padding: 12px;
+      }
+      .toolbar-filters {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+      .filter-input {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .task-cards-container {
+        grid-template-columns: 1fr;
+      }
+      .task-card {
+        padding: 16px 14px;
+        width: 100%;
+      }
+      .task-card-actions {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .btn-card-action {
+        min-width: calc(50% - 4px);
+      }
+      .modal-box {
+        margin: 10px;
+        width: calc(100vw - 20px);
+        max-height: 92vh;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #headerUserName {
+        display: none;
+      }
+      .user-pill {
+        padding: 4px;
+        background: none;
+        border: none;
+      }
+      .btn-card-action {
+        min-width: 100%;
       }
     }
   </style>
@@ -841,6 +976,17 @@
           <span>Logout</span>
         </button>
       </div>
+    </div>
+
+    <!-- Mobile Sub-Navigation Bar -->
+    <div class="task-mobile-subnav">
+      <nav class="task-mobile-pills">
+        <a href="index.html" class="task-mobile-pill"><span>🏠 Home</span></a>
+        <a href="employee-tasks.html" class="task-mobile-pill active"><span>✅ My Tasks</span></a>
+        <a href="manage-tasks.html" id="mobileNavManageTasksLink" class="task-mobile-pill" style="display:none;"><span>📋 Manage Team Tasks</span></a>
+        <a href="index.html#attendance" class="task-mobile-pill"><span>⏱️ Attendance</span></a>
+        <a href="admin.html" id="mobileNavAdminPortalLink" class="task-mobile-pill" style="display:none;"><span>👑 Admin Portal</span></a>
+      </nav>
     </div>
   </header>
 

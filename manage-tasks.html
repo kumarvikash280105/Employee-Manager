@@ -24,6 +24,16 @@
       --accent-red: #ef4444;
     }
 
+    html, body {
+      overflow-x: hidden;
+      max-width: 100vw;
+      width: 100%;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body.admin-body {
       background-color: var(--admin-bg);
       color: #1e293b;
@@ -693,12 +703,125 @@
       to { transform: translateX(0); opacity: 1; }
     }
 
+    .admin-mobile-subnav {
+      display: none;
+      background: #0b1a30;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 7px 12px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .admin-mobile-pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding-bottom: 2px;
+    }
+
+    .admin-mobile-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .mobile-nav-pill {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+    }
+
+    .mobile-nav-pill.active {
+      color: #ffffff;
+      background: var(--primary-blue);
+      border-color: var(--primary-blue);
+    }
+
     @media (max-width: 992px) {
       .admin-nav-pills {
-        display: none;
+        display: none !important;
+      }
+      .admin-mobile-subnav {
+        display: block;
+      }
+      .admin-nav-container {
+        padding: 0 12px;
+        height: 56px;
       }
       .manage-main {
-        padding: 16px;
+        padding: 16px 12px 36px;
+      }
+      .manage-hero {
+        padding: 20px 16px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .btn-create-task {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .kpi-card {
+        padding: 12px 14px;
+        gap: 10px;
+      }
+      .kpi-num {
+        font-size: 20px;
+      }
+      .manage-toolbar {
+        padding: 12px;
+      }
+      .filter-group {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+      }
+      .toolbar-select, .toolbar-input {
+        width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+      }
+      .form-row, .decision-cards-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .modal-box {
+        margin: 10px;
+        width: calc(100vw - 20px);
+        max-height: 92vh;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #headerUserName {
+        display: none;
+      }
+      .user-pill {
+        padding: 4px;
+        background: none;
+        border: none;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
       }
     }
   </style>
@@ -735,6 +858,19 @@
           <span>Logout</span>
         </button>
       </div>
+    </div>
+
+    <!-- Mobile Sub-Navigation Bar -->
+    <div class="admin-mobile-subnav">
+      <nav class="admin-mobile-pills">
+        <a href="admin.html#panelEmployees" class="mobile-nav-pill"><span>👥 Workforce</span></a>
+        <a href="admin.html#panelAttendance" class="mobile-nav-pill"><span>⏱️ Attendance</span></a>
+        <a href="admin.html#panelDepartments" class="mobile-nav-pill"><span>🏢 Departments</span></a>
+        <a href="roles-permissions.html" class="mobile-nav-pill"><span>🛡️ Roles &amp; Permissions</span></a>
+        <a href="manage-tasks.html" class="mobile-nav-pill active"><span>📋 Tasks</span></a>
+        <a href="employee-tasks.html" class="mobile-nav-pill"><span>✅ My Deliverables</span></a>
+        <a href="admin.html" class="mobile-nav-pill"><span>👑 Admin Portal</span></a>
+      </nav>
     </div>
   </header>
 

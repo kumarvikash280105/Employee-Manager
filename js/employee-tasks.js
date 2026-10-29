@@ -63,12 +63,16 @@ function updateHeaderUI() {
 
   const manageLink = document.getElementById('navManageTasksLink');
   const adminLink = document.getElementById('navAdminPortalLink');
+  const mobileManageLink = document.getElementById('mobileNavManageTasksLink');
+  const mobileAdminLink = document.getElementById('mobileNavAdminPortalLink');
 
-  if (manageLink && (isAdmin || isManager || hasTaskViewAll)) {
-    manageLink.style.display = 'inline-flex';
+  if (isAdmin || isManager || hasTaskViewAll) {
+    if (manageLink) manageLink.style.display = 'inline-flex';
+    if (mobileManageLink) mobileManageLink.style.display = 'inline-flex';
   }
-  if (adminLink && isAdmin) {
-    adminLink.style.display = 'inline-flex';
+  if (isAdmin) {
+    if (adminLink) adminLink.style.display = 'inline-flex';
+    if (mobileAdminLink) mobileAdminLink.style.display = 'inline-flex';
   }
 }
 

@@ -1939,10 +1939,17 @@ button, input, select, textarea {
   }
 }
 
-@media (max-width: 1100px) and (min-width: 769px) {
+@media (max-width: 1150px) and (min-width: 769px) {
   /* On compact laptop screens (1024px), hide redundant role button to keep desktop navbar sleek */
   #navbarRoleBtn {
     display: none !important;
+  }
+  .nav-actions {
+    gap: 6px;
+  }
+  .btn-nav-role, .btn-nav-admin, .btn-nav-attendance {
+    padding: 6px 10px;
+    font-size: 12px;
   }
 }
 
@@ -1982,7 +1989,9 @@ button, input, select, textarea {
      They are cleanly, touch-responsively displayed inside the mobile hamburger menu drawer! */
   #navbarRoleBtn,
   #navbarAttendanceBtn,
-  #navbarAdminLink {
+  #navbarAdminLink,
+  #navbarTasksBtn,
+  #navbarManageTasksBtn {
     display: none !important;
   }
 
