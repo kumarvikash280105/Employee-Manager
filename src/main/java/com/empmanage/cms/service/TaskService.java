@@ -494,7 +494,7 @@ public class TaskService {
             }
         }
 
-        List<TaskProgressUpdate> updates = progressUpdateRepository.findByTaskIdOrderByTimestampDesc(taskId);
+        List<TaskProgressUpdate> updates = progressUpdateRepository.findByTask_IdOrderByTimestampDesc(taskId);
         return updates.stream().map(TaskProgressDto::fromEntity).collect(Collectors.toList());
     }
 }
