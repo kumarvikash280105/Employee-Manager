@@ -109,6 +109,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const mobileDrawerEmail = document.getElementById('mobileDrawerEmail');
     const mobileDrawerRole = document.getElementById('mobileDrawerRole');
     const mobileDrawerAdminLink = document.getElementById('mobileDrawerAdminLink');
+    const mobileDrawerManageTasksLink = document.getElementById('mobileDrawerManageTasksLink');
+    const navbarTasksBtn = document.getElementById('navbarTasksBtn');
+    const navbarManageTasksBtn = document.getElementById('navbarManageTasksBtn');
     const mobileNavAdminWrap = document.querySelector('.mobile-nav-admin-wrap');
 
     if (user && user.email) {
@@ -117,6 +120,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (adminLoginNavBtn) adminLoginNavBtn.style.display = 'none';
 
       const isAdmin = (user.role === 'ROLE_ADMIN' || user.role === 'ADMIN');
+      const isManager = (user.role === 'ROLE_MANAGER' || user.role === 'ROLE_HR_MANAGER');
+      const hasTaskMgmt = isAdmin || isManager || (user.permissions && user.permissions.includes('TASK_VIEW_ALL'));
       const displayName = user.fullName || user.email.split('@')[0];
 
       if (badge) {
@@ -137,6 +142,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (adminLink) {
         adminLink.style.display = isAdmin ? 'inline-flex' : 'none';
+      }
+      if (navbarTasksBtn) {
+        navbarTasksBtn.style.display = 'inline-flex';
+      }
+      if (navbarManageTasksBtn) {
+        navbarManageTasksBtn.style.display = hasTaskMgmt ? 'inline-flex' : 'none';
       }
       if (roleBtn) {
         roleBtn.style.display = 'inline-flex';
@@ -179,6 +190,9 @@ document.addEventListener('DOMContentLoaded', () => {
       if (mobileDrawerAdminLink) {
         mobileDrawerAdminLink.style.display = isAdmin ? 'flex' : 'none';
       }
+      if (mobileDrawerManageTasksLink) {
+        mobileDrawerManageTasksLink.style.display = hasTaskMgmt ? 'flex' : 'none';
+      }
       if (mobileNavAdminWrap) {
         mobileNavAdminWrap.style.display = 'none';
       }
@@ -188,6 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (adminLoginNavBtn) adminLoginNavBtn.style.display = 'inline-flex';
       if (badge) badge.style.display = 'none';
       if (adminLink) adminLink.style.display = 'none';
+      if (navbarTasksBtn) navbarTasksBtn.style.display = 'none';
+      if (navbarManageTasksBtn) navbarManageTasksBtn.style.display = 'none';
       if (roleBtn) roleBtn.style.display = 'none';
       if (attBtn) attBtn.style.display = 'none';
       if (logoutBtn) logoutBtn.style.display = 'none';

@@ -47,6 +47,18 @@
                 <span class="mobile-action-pill-arrow">&rarr;</span>
               </button>
 
+              <a href="employee-tasks.html" class="mobile-action-pill mobile-action-role" id="mobileDrawerTasksLink">
+                <span class="mobile-action-pill-icon">✅</span>
+                <span class="mobile-action-pill-text">My Tasks &amp; Deliverables</span>
+                <span class="mobile-action-pill-arrow">&rarr;</span>
+              </a>
+
+              <a href="manage-tasks.html" class="mobile-action-pill mobile-action-admin" id="mobileDrawerManageTasksLink" style="display: none;">
+                <span class="mobile-action-pill-icon">📋</span>
+                <span class="mobile-action-pill-text">Manage Team Tasks</span>
+                <span class="mobile-action-pill-arrow">&rarr;</span>
+              </a>
+
               <button type="button" class="mobile-action-pill mobile-action-role" onclick="openUserRoleModal(); closeMobileMenu();">
                 <span class="mobile-action-pill-icon">🛡️</span>
                 <span class="mobile-action-pill-text">My Role &amp; Access Privileges</span>
@@ -117,6 +129,16 @@
           <span class="role-pill" id="navbarRolePill">STAFF</span>
         </button>
 
+        <!-- Tasks Dashboard Link -->
+        <a href="employee-tasks.html" id="navbarTasksBtn" class="btn-nav-role" style="display: none; text-decoration: none;" title="View your assigned tasks & deliverables">
+          <span>✅ My Tasks</span>
+        </a>
+
+        <!-- Manage Tasks Link for Admins & Managers -->
+        <a href="manage-tasks.html" id="navbarManageTasksBtn" class="btn-nav-admin" style="display: none; text-decoration: none;" title="Manage team deliverables & approve work">
+          <span>📋 Tasks</span>
+        </a>
+
         <!-- Attendance Button -->
         <button type="button" class="btn-nav-attendance" id="navbarAttendanceBtn" onclick="openAttendanceTracker()" style="display: none;">
           <span>⏱️ Attendance</span>
@@ -156,11 +178,18 @@
               var at = document.getElementById('navbarAttendanceBtn');
               var rb = document.getElementById('navbarRoleBtn');
               var lg = document.getElementById('navbarLogoutBtn');
+              var ntb = document.getElementById('navbarTasksBtn');
+              var nmtb = document.getElementById('navbarManageTasksBtn');
               var isAdmin = (u.role === 'ROLE_ADMIN' || u.role === 'ADMIN');
+              var isManager = (u.role === 'ROLE_MANAGER' || u.role === 'ROLE_HR_MANAGER');
+              var hasTaskMgmt = isAdmin || isManager || (u.permissions && u.permissions.includes('TASK_VIEW_ALL'));
+
               if (b1) b1.style.display = 'none';
               if (b2) b2.style.display = 'none';
               if (b3) b3.style.display = 'none';
               if (bd) bd.style.display = 'inline-flex';
+              if (ntb) ntb.style.display = 'inline-flex';
+              if (nmtb) nmtb.style.display = hasTaskMgmt ? 'inline-flex' : 'none';
               if (nm) nm.textContent = u.fullName || u.email.split('@')[0];
               if (av) {
                 av.textContent = (u.fullName || u.email || 'U').charAt(0).toUpperCase();
@@ -188,6 +217,7 @@
               var mda = document.getElementById('mobileDrawerAvatar');
               var mdr = document.getElementById('mobileDrawerRole');
               var mdal = document.getElementById('mobileDrawerAdminLink');
+              var mdmtl = document.getElementById('mobileDrawerManageTasksLink');
               var mnaw = document.querySelector('.mobile-nav-admin-wrap');
               if (mus) mus.style.display = 'block';
               if (mdn) mdn.textContent = u.fullName || u.email.split('@')[0];
@@ -201,6 +231,7 @@
                 mdr.style.color = isAdmin ? '#f87171' : '#38bdf8';
               }
               if (mdal) mdal.style.display = isAdmin ? 'flex' : 'none';
+              if (mdmtl) mdmtl.style.display = hasTaskMgmt ? 'flex' : 'none';
               if (mnaw) mnaw.style.display = 'none';
             }
           } catch(e) {}

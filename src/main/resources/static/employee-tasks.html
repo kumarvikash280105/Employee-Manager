@@ -1,0 +1,1064 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tasks &amp; Deliverables | EmpManage Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    :root {
+      --task-bg: #f8fafc;
+      --task-surface: #ffffff;
+      --task-border: #e2e8f0;
+      --primary-blue: #0284c7;
+      --primary-hover: #0369a1;
+      --navy-dark: #0f172a;
+      --navy-surface: #1e293b;
+      --accent-purple: #8b5cf6;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+    }
+
+    body.task-body {
+      background-color: var(--task-bg);
+      color: #1e293b;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    /* Sticky Header */
+    .task-header {
+      background-color: var(--navy-dark);
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      width: 100%;
+    }
+
+    .task-nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      padding: 0 20px;
+      max-width: 1400px;
+      margin: 0 auto;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .task-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .task-nav-link {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13.5px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .task-nav-link:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .task-nav-link.active {
+      color: #ffffff;
+      background: var(--primary-blue);
+    }
+
+    .task-user-meta {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      color: #f1f5f9;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .user-pill-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .btn-task-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-clock-quick {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #34d399;
+    }
+
+    .btn-clock-quick:hover {
+      background: rgba(16, 185, 129, 0.25);
+      color: #ffffff;
+    }
+
+    .btn-header-logout {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #f87171;
+    }
+
+    .btn-header-logout:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    /* Main Container */
+    .task-main {
+      max-width: 1400px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 48px;
+      box-sizing: border-box;
+      flex: 1;
+    }
+
+    /* Hero Banner */
+    .task-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-radius: 16px;
+      padding: 28px 32px;
+      color: #ffffff;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .task-hero-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-hero-subtitle {
+      font-size: 14.5px;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .task-hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Metrics Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--task-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      cursor: pointer;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -4px rgba(0,0,0,0.08);
+    }
+
+    .kpi-card.active-filter {
+      border-color: var(--primary-blue);
+      background: #f0f9ff;
+    }
+
+    .kpi-icon-wrap {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .kpi-info {
+      flex: 1;
+    }
+
+    .kpi-num {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .kpi-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Toolbar & Filters */
+    .task-toolbar {
+      background: #ffffff;
+      border: 1px solid var(--task-border);
+      border-radius: 12px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .toolbar-filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .filter-input {
+      padding: 8px 14px;
+      font-size: 13.5px;
+      border: 1px solid var(--task-border);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .filter-input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    .search-input {
+      min-width: 220px;
+      flex: 1;
+    }
+
+    /* Task Card Grid */
+    .task-cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 20px;
+    }
+
+    .task-card {
+      background: #ffffff;
+      border: 1px solid var(--task-border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .task-card:hover {
+      box-shadow: 0 10px 20px -5px rgba(0,0,0,0.08);
+      border-color: #cbd5e1;
+    }
+
+    .task-card.is-overdue {
+      border-left: 4px solid var(--accent-red);
+    }
+
+    .task-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .task-card-title {
+      font-size: 16.5px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      line-height: 1.35;
+    }
+
+    .task-card-desc {
+      font-size: 13.5px;
+      color: #475569;
+      line-height: 1.5;
+      margin: 0 0 16px 0;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .task-badge-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .task-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .badge-priority-urgent { background: #fee2e2; color: #b91c1c; }
+    .badge-priority-high { background: #ffedd5; color: #c2410c; }
+    .badge-priority-medium { background: #fef3c7; color: #b45309; }
+    .badge-priority-low { background: #e0f2fe; color: #0369a1; }
+
+    .badge-status-to-do { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .badge-status-in-progress { background: #e0f2fe; color: #0284c7; }
+    .badge-status-in-review { background: #f3e8ff; color: #7e22ce; }
+    .badge-status-completed { background: #dcfce7; color: #15803d; }
+    .badge-status-cancelled { background: #f1f5f9; color: #94a3b8; }
+
+    .badge-overdue {
+      background: #fee2e2;
+      color: #b91c1c;
+      animation: pulseAlert 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
+    /* Progress Bar */
+    .task-progress-box {
+      margin: 16px 0;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #64748b;
+      margin-bottom: 6px;
+    }
+
+    .progress-track {
+      background: #e2e8f0;
+      height: 8px;
+      border-radius: 9999px;
+      overflow: hidden;
+      width: 100%;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-fill-low { background: #0284c7; }
+    .progress-fill-mid { background: #f59e0b; }
+    .progress-fill-high { background: #8b5cf6; }
+    .progress-fill-done { background: #10b981; }
+
+    /* Task Card Dates & Meta */
+    .task-meta-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      border-radius: 8px;
+      font-size: 12px;
+      margin-bottom: 16px;
+      border: 1px solid #f1f5f9;
+    }
+
+    .meta-item-label {
+      color: #64748b;
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+
+    .meta-item-val {
+      color: #1e293b;
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Task Card Actions */
+    .task-card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #f1f5f9;
+      padding-top: 14px;
+      margin-top: 6px;
+    }
+
+    .btn-card-action {
+      flex: 1;
+      padding: 8px 10px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-update-progress {
+      background: #f0f9ff;
+      border-color: #bae6fd;
+      color: #0284c7;
+    }
+
+    .btn-update-progress:hover {
+      background: #0284c7;
+      color: #ffffff;
+    }
+
+    .btn-submit-review {
+      background: #f5f3ff;
+      border-color: #ddd6fe;
+      color: #7c3aed;
+    }
+
+    .btn-submit-review:hover {
+      background: #7c3aed;
+      color: #ffffff;
+    }
+
+    .btn-view-history {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #475569;
+    }
+
+    .btn-view-history:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    /* Modal Framework */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: 16px;
+      max-width: 580px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--task-border);
+    }
+
+    .modal-box-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--task-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .modal-box-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .modal-box-body {
+      padding: 24px;
+    }
+
+    .modal-box-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--task-border);
+      background: #f8fafc;
+      border-radius: 0 0 16px 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    /* Timeline & History */
+    .timeline {
+      position: relative;
+      padding-left: 28px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 6px;
+      bottom: 6px;
+      width: 2px;
+      background: #e2e8f0;
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      left: -28px;
+      top: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 3px solid var(--primary-blue);
+      box-sizing: border-box;
+    }
+
+    .timeline-content {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+      margin-bottom: 6px;
+    }
+
+    .timeline-author {
+      font-weight: 700;
+      color: #0f172a;
+    }
+
+    .timeline-time {
+      color: #64748b;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+    }
+
+    .timeline-body {
+      font-size: 13.5px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    /* Slider styling */
+    .progress-slider-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    .slider-input {
+      flex: 1;
+      height: 8px;
+      border-radius: 9999px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+    }
+
+    .slider-input::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--primary-blue);
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+
+    .slider-val-box {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--primary-blue);
+      font-family: 'JetBrains Mono', monospace;
+      min-width: 50px;
+      text-align: right;
+    }
+
+    .quick-inc-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .btn-inc {
+      padding: 5px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .btn-inc:hover {
+      background: #f1f5f9;
+      border-color: #94a3b8;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 64px 20px;
+      background: #ffffff;
+      border: 1px dashed #cbd5e1;
+      border-radius: 16px;
+      grid-column: 1 / -1;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .empty-state-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .empty-state-desc {
+      font-size: 14px;
+      color: #64748b;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* Toast Container */
+    #toastContainer {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-success { background: #059669; }
+    .toast-error { background: #dc2626; }
+    .toast-info { background: #0284c7; }
+
+    @keyframes slideInToast {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      .task-cards-container {
+        grid-template-columns: 1fr;
+      }
+      .task-hero {
+        padding: 20px;
+      }
+      .task-nav-container {
+        padding: 0 12px;
+      }
+    }
+  </style>
+</head>
+<body class="task-body">
+
+  <!-- Sticky Top Header -->
+  <header class="task-header">
+    <div class="task-nav-container">
+      <a href="index.html" class="brand-logo">
+        <svg class="logo-icon" viewBox="0 0 42 32" fill="none" style="width:26px; height:26px;">
+          <circle cx="21" cy="9" r="6" fill="#ffffff" />
+          <path d="M7 29C7 22.3726 13.268 17 21 17C28.732 17 35 22.3726 35 29" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span style="font-size: 17px; font-weight: 800; color: #ffffff;">EmpManage</span>
+      </a>
+
+      <nav class="task-nav-links">
+        <a href="index.html" class="task-nav-link"><span>🏠 Home</span></a>
+        <a href="employee-tasks.html" class="task-nav-link active"><span>✅ My Tasks</span></a>
+        <a href="manage-tasks.html" id="navManageTasksLink" class="task-nav-link" style="display:none;"><span>📋 Manage Team Tasks</span></a>
+        <a href="admin.html" id="navAdminPortalLink" class="task-nav-link" style="display:none;"><span>👑 Admin Portal</span></a>
+      </nav>
+
+      <div class="task-user-meta">
+        <div class="user-pill">
+          <div class="user-pill-avatar" id="headerUserAvatar">U</div>
+          <span id="headerUserName">Employee Name</span>
+        </div>
+        <button type="button" class="btn-task-action btn-header-logout" onclick="handleLogout()" title="Sign out of EmpManage">
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="task-main">
+
+    <!-- Hero Banner -->
+    <section class="task-hero">
+      <div>
+        <h1 class="task-hero-title">
+          <span>🎯</span> <span id="heroWelcomeName">My Assigned Tasks</span>
+        </h1>
+        <p class="task-hero-subtitle">
+          Track deliverables, update your progress percentage, log milestones, and submit work for manager review.
+        </p>
+      </div>
+      <div class="task-hero-actions">
+        <button type="button" class="btn-task-action" style="background:#ffffff; color:#0f172a;" onclick="loadMyTasks()">
+          <span>🔄 Refresh Tasks</span>
+        </button>
+        <a href="index.html#attendance" class="btn-task-action btn-clock-quick">
+          <span>⏱️ Attendance Clock</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- KPI Metrics Grid -->
+    <section class="kpi-grid">
+      <div class="kpi-card active-filter" id="cardFilterAll" onclick="setQuickStatusFilter('ALL')">
+        <div class="kpi-icon-wrap" style="background: #e0f2fe; color: #0284c7;">📌</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statTotalTasks">0</div>
+          <div class="kpi-label">Total Assigned</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterToDo" onclick="setQuickStatusFilter('TO_DO')">
+        <div class="kpi-icon-wrap" style="background: #f1f5f9; color: #475569;">⏳</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statToDoTasks">0</div>
+          <div class="kpi-label">To Do</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterInProgress" onclick="setQuickStatusFilter('IN_PROGRESS')">
+        <div class="kpi-icon-wrap" style="background: #fef3c7; color: #b45309;">⚡</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statInProgressTasks">0</div>
+          <div class="kpi-label">In Progress</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterInReview" onclick="setQuickStatusFilter('IN_REVIEW')">
+        <div class="kpi-icon-wrap" style="background: #f3e8ff; color: #7e22ce;">🔍</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statInReviewTasks">0</div>
+          <div class="kpi-label">Under Review</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterCompleted" onclick="setQuickStatusFilter('COMPLETED')">
+        <div class="kpi-icon-wrap" style="background: #dcfce7; color: #15803d;">🎉</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statCompletedTasks">0</div>
+          <div class="kpi-label">Completed</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterOverdue" onclick="setQuickStatusFilter('OVERDUE')">
+        <div class="kpi-icon-wrap" style="background: #fee2e2; color: #b91c1c;">⚠️</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statOverdueTasks">0</div>
+          <div class="kpi-label">Overdue</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter & Search Toolbar -->
+    <section class="task-toolbar">
+      <div class="toolbar-filters">
+        <input type="text" id="taskSearchInput" class="filter-input search-input" placeholder="Search tasks by title or keyword..." oninput="debounceSearch()">
+        
+        <select id="taskStatusSelect" class="filter-input" onchange="handleFilterChange()">
+          <option value="ALL">All Statuses</option>
+          <option value="TO_DO">To Do</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="IN_REVIEW">Under Review</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="OVERDUE">Overdue Only</option>
+        </select>
+
+        <select id="taskPrioritySelect" class="filter-input" onchange="handleFilterChange()">
+          <option value="ALL">All Priorities</option>
+          <option value="URGENT">Urgent Priority</option>
+          <option value="HIGH">High Priority</option>
+          <option value="MEDIUM">Medium Priority</option>
+          <option value="LOW">Low Priority</option>
+        </select>
+
+        <button type="button" class="btn-task-action" style="background:#f1f5f9; color:#475569;" onclick="resetFilters()">
+          <span>Reset</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Task Cards Container -->
+    <section class="task-cards-container" id="tasksCardsGrid">
+      <div class="empty-state">
+        <div class="empty-state-icon">🔄</div>
+        <div class="empty-state-title">Loading assigned tasks...</div>
+        <div class="empty-state-desc">Fetching your deliverables from the server.</div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal 1: Update Progress -->
+  <div class="modal-backdrop" id="updateProgressModal">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3 class="modal-box-title"><span>📈</span> Update Task Progress</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('updateProgressModal')">&times;</button>
+      </div>
+      <form id="progressForm" onsubmit="submitProgressUpdate(event)">
+        <div class="modal-box-body">
+          <input type="hidden" id="modalTaskId">
+
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">Task Title</label>
+            <div id="modalTaskTitle" style="font-size: 15px; font-weight: 700; color: #0f172a;"></div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Progress Percentage</label>
+            <div class="quick-inc-row">
+              <button type="button" class="btn-inc" onclick="addProgress(10)">+10%</button>
+              <button type="button" class="btn-inc" onclick="addProgress(25)">+25%</button>
+              <button type="button" class="btn-inc" onclick="addProgress(50)">+50%</button>
+              <button type="button" class="btn-inc" onclick="setProgressVal(100)">Set 100%</button>
+            </div>
+            <div class="progress-slider-wrap">
+              <input type="range" id="progressSlider" class="slider-input" min="0" max="100" value="0" oninput="syncSliderVal(this.value)">
+              <div class="slider-val-box" id="sliderValDisplay">0%</div>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="progressWorkDescription" style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Work Description &amp; Milestones Logged *</label>
+            <textarea id="progressWorkDescription" rows="4" class="filter-input" style="width: 100%; box-sizing: border-box; resize: vertical;" placeholder="Describe the work completed, components built, or milestones achieved..." required></textarea>
+          </div>
+        </div>
+        <div class="modal-box-footer">
+          <button type="button" class="btn-task-action" style="background:#e2e8f0; color:#334155;" onclick="closeModal('updateProgressModal')">Cancel</button>
+          <button type="submit" class="btn-task-action" style="background:var(--primary-blue); color:#ffffff;" id="btnSubmitProgress">Save Progress Log</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Submit for Review -->
+  <div class="modal-backdrop" id="submitReviewModal">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3 class="modal-box-title"><span>🚀</span> Submit Work for Manager Review</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('submitReviewModal')">&times;</button>
+      </div>
+      <form id="submitReviewForm" onsubmit="executeSubmitForReview(event)">
+        <div class="modal-box-body">
+          <input type="hidden" id="submitModalTaskId">
+
+          <div style="background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+            <div style="font-weight: 700; color: #166534; font-size: 14px; margin-bottom: 4px;">Ready to deliver?</div>
+            <div style="font-size: 13px; color: #15803d; line-height: 1.4;">
+              Submitting transitions this task status to <strong>Under Review</strong> and sets progress to 100%. Your manager will be alerted to inspect and approve your deliverable.
+            </div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 4px;">Task Title</label>
+            <div id="submitModalTaskTitle" style="font-size: 15px; font-weight: 700; color: #0f172a;"></div>
+          </div>
+
+          <div style="margin-bottom: 16px;">
+            <label for="submitWorkNotes" style="font-size: 13px; font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">Submission Notes &amp; Links to Deliverables (Optional)</label>
+            <textarea id="submitWorkNotes" rows="4" class="filter-input" style="width: 100%; box-sizing: border-box; resize: vertical;" placeholder="Provide deliverables links, PR references, or instructions for the reviewing manager..."></textarea>
+          </div>
+        </div>
+        <div class="modal-box-footer">
+          <button type="button" class="btn-task-action" style="background:#e2e8f0; color:#334155;" onclick="closeModal('submitReviewModal')">Cancel</button>
+          <button type="submit" class="btn-task-action" style="background:#7c3aed; color:#ffffff;" id="btnConfirmSubmit">Submit for Review</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Task Details & History -->
+  <div class="modal-backdrop" id="taskHistoryModal">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-box-header">
+        <h3 class="modal-box-title"><span>📜</span> Task Timeline &amp; Progress History</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('taskHistoryModal')">&times;</button>
+      </div>
+      <div class="modal-box-body">
+        <div id="historyTaskOverview" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;"></div>
+        <h4 style="font-size: 14px; font-weight: 700; color: #0f172a; margin: 0 0 16px 0;">Audit History &amp; Reviewer Feedback</h4>
+        <div class="timeline" id="historyTimelineContainer">
+          <!-- Dynamically populated timeline items -->
+        </div>
+      </div>
+      <div class="modal-box-footer">
+        <button type="button" class="btn-task-action" style="background:var(--primary-blue); color:#ffffff;" onclick="closeModal('taskHistoryModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer"></div>
+
+  <script src="js/employee-tasks.js"></script>
+</body>
+</html>

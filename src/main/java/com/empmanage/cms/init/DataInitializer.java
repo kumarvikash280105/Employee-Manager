@@ -119,7 +119,19 @@ public class DataInitializer implements CommandLineRunner {
             new Permission("USER_MANAGE", "USERS", "EDIT", "Manage user accounts, passwords, and statuses"),
 
             // ROLES Module
-            new Permission("ROLE_MANAGE", "ROLES", "EDIT", "Create, configure, and assign roles & permission matrix")
+            new Permission("ROLE_MANAGE", "ROLES", "EDIT", "Create, configure, and assign roles & permission matrix"),
+
+            // TASKS Module
+            new Permission("TASK_VIEW_OWN", "TASKS", "VIEW", "View personal assigned tasks"),
+            new Permission("TASK_VIEW_ALL", "TASKS", "VIEW", "View all company and department tasks"),
+            new Permission("TASK_CREATE", "TASKS", "CREATE", "Create and define new tasks"),
+            new Permission("TASK_ASSIGN", "TASKS", "EDIT", "Assign tasks to workforce employees"),
+            new Permission("TASK_UPDATE_OWN", "TASKS", "EDIT", "Update progress and work notes on personal tasks"),
+            new Permission("TASK_UPDATE_ALL", "TASKS", "EDIT", "Update and modify any company task"),
+            new Permission("TASK_SUBMIT", "TASKS", "EDIT", "Submit completed work for manager review"),
+            new Permission("TASK_REVIEW", "TASKS", "EDIT", "Review, approve, or request changes on submitted tasks"),
+            new Permission("TASK_DELETE", "TASKS", "DELETE", "Delete tasks from the system"),
+            new Permission("TASK_ANALYTICS_VIEW", "TASKS", "VIEW", "View task analytics, completion rates, and metrics")
         );
 
         Map<String, Permission> permMap = new HashMap<>();
@@ -136,27 +148,32 @@ public class DataInitializer implements CommandLineRunner {
         // ROLE_ADMIN: All permissions
         initRoleIfMissing("ROLE_ADMIN", "Administrator", "Full unrestricted administrative access to all system features.", true, permMap.values());
 
-        // ROLE_HR_MANAGER: Workforce, attendance, reports, departments view
+        // ROLE_HR_MANAGER: Workforce, attendance, reports, departments view, task management oversight
         Set<Permission> hrPerms = new HashSet<>();
         addPerms(hrPerms, permMap, "EMPLOYEE_VIEW", "EMPLOYEE_CREATE", "EMPLOYEE_EDIT", "EMPLOYEE_EXPORT",
                 "DEPARTMENT_VIEW", "ATTENDANCE_VIEW", "ATTENDANCE_CREATE", "ATTENDANCE_EDIT", "ATTENDANCE_EXPORT",
-                "REPORT_VIEW", "REPORT_EXPORT", "USER_VIEW");
+                "REPORT_VIEW", "REPORT_EXPORT", "USER_VIEW",
+                "TASK_VIEW_OWN", "TASK_VIEW_ALL", "TASK_CREATE", "TASK_ASSIGN", "TASK_ANALYTICS_VIEW");
         initRoleIfMissing("ROLE_HR_MANAGER", "HR Manager", "Human resources manager with workforce, shift scheduling, and reporting access.", false, hrPerms);
 
-        // ROLE_MANAGER: Department workforce & attendance management
+        // ROLE_MANAGER: Department workforce & attendance management, task creation, assignment & review
         Set<Permission> mgrPerms = new HashSet<>();
         addPerms(mgrPerms, permMap, "EMPLOYEE_VIEW", "EMPLOYEE_EDIT", "DEPARTMENT_VIEW",
-                "ATTENDANCE_VIEW", "ATTENDANCE_CREATE", "ATTENDANCE_EDIT", "REPORT_VIEW");
+                "ATTENDANCE_VIEW", "ATTENDANCE_CREATE", "ATTENDANCE_EDIT", "REPORT_VIEW",
+                "TASK_VIEW_OWN", "TASK_VIEW_ALL", "TASK_CREATE", "TASK_ASSIGN", "TASK_UPDATE_OWN",
+                "TASK_UPDATE_ALL", "TASK_SUBMIT", "TASK_REVIEW", "TASK_ANALYTICS_VIEW");
         initRoleIfMissing("ROLE_MANAGER", "Department Manager", "Departmental supervisor with team workforce oversight and shift management.", false, mgrPerms);
 
-        // ROLE_USER: Standard employee shift clock & catalog
+        // ROLE_USER: Standard employee shift clock & task execution
         Set<Permission> userPerms = new HashSet<>();
-        addPerms(userPerms, permMap, "EMPLOYEE_VIEW", "DEPARTMENT_VIEW", "ATTENDANCE_CREATE", "CMS_VIEW");
+        addPerms(userPerms, permMap, "EMPLOYEE_VIEW", "DEPARTMENT_VIEW", "ATTENDANCE_CREATE", "CMS_VIEW",
+                "TASK_VIEW_OWN", "TASK_UPDATE_OWN", "TASK_SUBMIT");
         initRoleIfMissing("ROLE_USER", "Standard Employee", "Standard employee role with personal attendance shift clock and public directory access.", true, userPerms);
 
         // ROLE_VIEWER: Read-only access
         Set<Permission> viewerPerms = new HashSet<>();
-        addPerms(viewerPerms, permMap, "EMPLOYEE_VIEW", "DEPARTMENT_VIEW", "CMS_VIEW", "REPORT_VIEW");
+        addPerms(viewerPerms, permMap, "EMPLOYEE_VIEW", "DEPARTMENT_VIEW", "CMS_VIEW", "REPORT_VIEW",
+                "TASK_VIEW_ALL", "TASK_ANALYTICS_VIEW");
         initRoleIfMissing("ROLE_VIEWER", "Read-Only Viewer", "Auditor and read-only access to workforce directories, departments, and general reports.", false, viewerPerms);
     }
 
@@ -175,11 +192,13 @@ public class DataInitializer implements CommandLineRunner {
             roleRepository.save(role);
         } else {
             Role role = roleOpt.get();
-            // Ensure permissions are updated if needed
-            if (role.getPermissions() == null || role.getPermissions().isEmpty()) {
+            // Ensure newly added permissions are merged
+            if (role.getPermissions() == null) {
                 role.setPermissions(new HashSet<>(permissions));
-                roleRepository.save(role);
+            } else {
+                role.getPermissions().addAll(permissions);
             }
+            roleRepository.save(role);
         }
     }
 

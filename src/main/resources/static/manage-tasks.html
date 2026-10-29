@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Manage Tasks &amp; Team Deliverables | EmpManage Enterprise</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    :root {
+      --admin-bg: #f8fafc;
+      --admin-surface: #ffffff;
+      --admin-border: #e2e8f0;
+      --navy-dark: #0f172a;
+      --navy-surface: #1e293b;
+      --primary-blue: #0284c7;
+      --primary-hover: #0369a1;
+      --accent-purple: #7c3aed;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+    }
+
+    body.admin-body {
+      background-color: var(--admin-bg);
+      color: #1e293b;
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+
+    .admin-header {
+      background-color: var(--navy-dark);
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      width: 100%;
+    }
+
+    .admin-nav-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      padding: 0 20px;
+      width: 100%;
+      box-sizing: border-box;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .admin-nav-pills {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      background: var(--navy-surface);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      overflow-x: auto;
+    }
+
+    .admin-nav-pill {
+      color: #94a3b8;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: 7px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .admin-nav-pill:hover {
+      color: #ffffff;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .admin-nav-pill.active {
+      color: #ffffff;
+      background: var(--primary-blue);
+    }
+
+    .admin-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      padding: 5px 12px;
+      border-radius: 9999px;
+      color: #f1f5f9;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .user-pill-avatar {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .btn-header-logout {
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      color: #f87171;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-header-logout:hover {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    /* Main Container */
+    .manage-main {
+      padding: 24px 24px 48px;
+      max-width: 1600px;
+      width: 100%;
+      margin: 0 auto;
+      box-sizing: border-box;
+      flex: 1;
+    }
+
+    /* Hero Banner */
+    .manage-hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+      border-radius: 16px;
+      padding: 28px 32px;
+      color: #ffffff;
+      margin-bottom: 24px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .manage-hero-title {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .manage-hero-subtitle {
+      font-size: 14.5px;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .btn-create-task {
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #ffffff;
+      border: none;
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-create-task:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(2, 132, 199, 0.45);
+    }
+
+    /* Analytics Metrics Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-card {
+      background: #ffffff;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px -4px rgba(0,0,0,0.08);
+    }
+
+    .kpi-card.active-filter {
+      border-color: var(--primary-blue);
+      background: #f0f9ff;
+    }
+
+    .kpi-card.attention {
+      border-color: #ddd6fe;
+      background: #faf5ff;
+    }
+
+    .kpi-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .kpi-info {
+      flex: 1;
+    }
+
+    .kpi-num {
+      font-size: 26px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1.2;
+    }
+
+    .kpi-label {
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #64748b;
+      margin-top: 2px;
+    }
+
+    /* Filter Toolbar */
+    .manage-toolbar {
+      background: #ffffff;
+      border: 1px solid var(--admin-border);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    .filter-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .toolbar-select, .toolbar-input {
+      padding: 8px 14px;
+      font-size: 13.5px;
+      border: 1px solid var(--admin-border);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .toolbar-select:focus, .toolbar-input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    .search-input {
+      min-width: 240px;
+      flex: 1;
+    }
+
+    /* Table & Container */
+    .table-container {
+      background: #ffffff;
+      border: 1px solid var(--admin-border);
+      border-radius: 14px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+      overflow-x: auto;
+    }
+
+    .manage-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+      text-align: left;
+    }
+
+    .manage-table th {
+      background: #f8fafc;
+      color: #475569;
+      font-weight: 700;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--admin-border);
+      white-space: nowrap;
+      text-transform: uppercase;
+      font-size: 11.5px;
+      letter-spacing: 0.05em;
+    }
+
+    .manage-table td {
+      padding: 16px 18px;
+      border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle;
+      color: #1e293b;
+    }
+
+    .manage-table tr:hover td {
+      background: #f8fafc;
+    }
+
+    .manage-table tr.row-in-review td {
+      background: #faf5ff;
+    }
+
+    /* Badges */
+    .task-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+
+    .badge-priority-urgent { background: #fee2e2; color: #b91c1c; }
+    .badge-priority-high { background: #ffedd5; color: #c2410c; }
+    .badge-priority-medium { background: #fef3c7; color: #b45309; }
+    .badge-priority-low { background: #e0f2fe; color: #0369a1; }
+
+    .badge-status-to-do { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+    .badge-status-in-progress { background: #e0f2fe; color: #0284c7; }
+    .badge-status-in-review { background: #f3e8ff; color: #7e22ce; }
+    .badge-status-completed { background: #dcfce7; color: #15803d; }
+    .badge-status-cancelled { background: #f1f5f9; color: #94a3b8; }
+
+    .badge-overdue {
+      background: #fee2e2;
+      color: #b91c1c;
+      animation: pulseAlert 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseAlert {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.65; }
+    }
+
+    /* Mini Progress */
+    .mini-progress-track {
+      background: #e2e8f0;
+      height: 6px;
+      width: 100px;
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .mini-progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+    }
+
+    /* Action Buttons in Table */
+    .table-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      white-space: nowrap;
+    }
+
+    .btn-tbl-action {
+      padding: 6px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      border: 1px solid transparent;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-tbl-review {
+      background: #f3e8ff;
+      border-color: #d8b4fe;
+      color: #7e22ce;
+      font-weight: 700;
+    }
+
+    .btn-tbl-review:hover {
+      background: #7e22ce;
+      color: #ffffff;
+    }
+
+    .btn-tbl-edit {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+      color: #334155;
+    }
+
+    .btn-tbl-edit:hover {
+      background: #0284c7;
+      border-color: #0284c7;
+      color: #ffffff;
+    }
+
+    .btn-tbl-history {
+      background: #f8fafc;
+      border-color: #e2e8f0;
+      color: #64748b;
+    }
+
+    .btn-tbl-history:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .btn-tbl-delete {
+      background: #fff1f2;
+      border-color: #fecdd3;
+      color: #e11d48;
+    }
+
+    .btn-tbl-delete:hover {
+      background: #e11d48;
+      color: #ffffff;
+    }
+
+    /* Modals */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .modal-backdrop.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: #ffffff;
+      border-radius: 16px;
+      max-width: 620px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--admin-border);
+    }
+
+    .modal-box-header {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--admin-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #f8fafc;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .modal-box-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-close-btn {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: 8px;
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close-btn:hover {
+      background: #e2e8f0;
+      color: #0f172a;
+    }
+
+    .modal-box-body {
+      padding: 24px;
+    }
+
+    .modal-box-footer {
+      padding: 16px 24px;
+      border-top: 1px solid var(--admin-border);
+      background: #f8fafc;
+      border-radius: 0 0 16px 16px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .form-control {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 14px;
+      font-size: 13.5px;
+      border: 1px solid var(--admin-border);
+      border-radius: 8px;
+      background: #ffffff;
+      color: #1e293b;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-control:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.12);
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    /* Review Decision Radio Cards */
+    .decision-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .decision-card {
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .decision-card:hover {
+      border-color: #94a3b8;
+    }
+
+    .decision-card.selected-approve {
+      border-color: #10b981;
+      background: #f0fdf4;
+    }
+
+    .decision-card.selected-changes {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center;
+      padding: 64px 20px;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .empty-state-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 6px;
+    }
+
+    .empty-state-desc {
+      font-size: 14px;
+      color: #64748b;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* Toast */
+    #toastContainer {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .toast {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: #ffffff;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideInToast 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .toast-success { background: #059669; }
+    .toast-error { background: #dc2626; }
+    .toast-info { background: #0284c7; }
+
+    @keyframes slideInToast {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    @media (max-width: 992px) {
+      .admin-nav-pills {
+        display: none;
+      }
+      .manage-main {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <!-- Header & Navigation -->
+  <header class="admin-header">
+    <div class="admin-nav-container">
+      <a href="index.html" class="brand-logo">
+        <svg class="logo-icon" viewBox="0 0 42 32" fill="none" style="width:26px; height:26px;">
+          <circle cx="21" cy="9" r="6" fill="#ffffff" />
+          <path d="M7 29C7 22.3726 13.268 17 21 17C28.732 17 35 22.3726 35 29" stroke="#ffffff" stroke-width="3" stroke-linecap="round" />
+        </svg>
+        <span style="font-size: 17px; font-weight: 800; color: #ffffff;">EmpManage</span>
+      </a>
+
+      <nav class="admin-nav-pills">
+        <a href="admin.html#panelEmployees" class="admin-nav-pill"><span>👥 Workforce</span></a>
+        <a href="admin.html#panelAttendance" class="admin-nav-pill"><span>⏱️ Attendance</span></a>
+        <a href="admin.html#panelDepartments" class="admin-nav-pill"><span>🏢 Departments</span></a>
+        <a href="roles-permissions.html" class="admin-nav-pill"><span>🛡️ Roles &amp; Permissions</span></a>
+        <a href="manage-tasks.html" class="admin-nav-pill active"><span>📋 Tasks Management</span></a>
+        <a href="employee-tasks.html" class="admin-nav-pill"><span>✅ My Deliverables</span></a>
+        <a href="admin.html" class="admin-nav-pill"><span>👑 Admin Portal</span></a>
+      </nav>
+
+      <div class="admin-header-actions">
+        <div class="user-pill">
+          <div class="user-pill-avatar" id="headerUserAvatar">M</div>
+          <span id="headerUserName">Manager Name</span>
+        </div>
+        <button type="button" class="btn-header-logout" onclick="handleLogout()" title="Sign out">
+          <span>Logout</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="manage-main">
+
+    <!-- Hero Header -->
+    <section class="manage-hero">
+      <div>
+        <h1 class="manage-hero-title">
+          <span>📋</span> Team Deliverables &amp; Task Oversight
+        </h1>
+        <p class="manage-hero-subtitle">
+          Assign deliverables across departments, track employee progress milestones, and approve submitted work.
+        </p>
+      </div>
+      <div>
+        <button type="button" class="btn-create-task" onclick="openCreateTaskModal()">
+          <span>➕ Create New Task</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Analytics KPI Cards -->
+    <section class="kpi-grid">
+      <div class="kpi-card active-filter" id="cardFilterAll" onclick="setQuickStatusFilter('ALL')">
+        <div class="kpi-icon-wrap" style="background: #e0f2fe; color: #0284c7;">📊</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statTotal">0</div>
+          <div class="kpi-label">Total Tasks</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterToDo" onclick="setQuickStatusFilter('TO_DO')">
+        <div class="kpi-icon-wrap" style="background: #f1f5f9; color: #475569;">⏳</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statToDo">0</div>
+          <div class="kpi-label">To Do</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterInProgress" onclick="setQuickStatusFilter('IN_PROGRESS')">
+        <div class="kpi-icon-wrap" style="background: #fef3c7; color: #b45309;">⚡</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statInProgress">0</div>
+          <div class="kpi-label">In Progress</div>
+        </div>
+      </div>
+
+      <div class="kpi-card attention" id="cardFilterInReview" onclick="setQuickStatusFilter('IN_REVIEW')">
+        <div class="kpi-icon-wrap" style="background: #f3e8ff; color: #7e22ce;">🔍</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statInReview">0</div>
+          <div class="kpi-label">Needs Review</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterCompleted" onclick="setQuickStatusFilter('COMPLETED')">
+        <div class="kpi-icon-wrap" style="background: #dcfce7; color: #15803d;">🎉</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statCompleted">0</div>
+          <div class="kpi-label">Completed</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" id="cardFilterOverdue" onclick="setQuickStatusFilter('OVERDUE')">
+        <div class="kpi-icon-wrap" style="background: #fee2e2; color: #b91c1c;">⚠️</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statOverdue">0</div>
+          <div class="kpi-label">Overdue Tasks</div>
+        </div>
+      </div>
+
+      <div class="kpi-card" style="cursor: default;">
+        <div class="kpi-icon-wrap" style="background: #ecfdf5; color: #059669;">🚀</div>
+        <div class="kpi-info">
+          <div class="kpi-num" id="statCompletionRate">0%</div>
+          <div class="kpi-label">Completion Velocity</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Toolbar Filters -->
+    <section class="manage-toolbar">
+      <div class="filter-group">
+        <input type="text" id="taskSearchInput" class="toolbar-input search-input" placeholder="Search tasks by title, description, or assignee..." oninput="debounceSearch()">
+
+        <select id="taskStatusSelect" class="toolbar-select" onchange="handleFilterChange()">
+          <option value="ALL">All Statuses</option>
+          <option value="TO_DO">To Do</option>
+          <option value="IN_PROGRESS">In Progress</option>
+          <option value="IN_REVIEW">Under Review</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="OVERDUE">Overdue Only</option>
+        </select>
+
+        <select id="taskPrioritySelect" class="toolbar-select" onchange="handleFilterChange()">
+          <option value="ALL">All Priorities</option>
+          <option value="URGENT">Urgent Priority</option>
+          <option value="HIGH">High Priority</option>
+          <option value="MEDIUM">Medium Priority</option>
+          <option value="LOW">Low Priority</option>
+        </select>
+
+        <select id="taskDeptSelect" class="toolbar-select" onchange="handleFilterChange()">
+          <option value="ALL">All Departments</option>
+          <!-- Populated dynamically -->
+        </select>
+
+        <button type="button" class="btn-tbl-action btn-tbl-edit" onclick="resetFilters()">
+          <span>Reset Filters</span>
+        </button>
+      </div>
+
+      <div>
+        <button type="button" class="btn-tbl-action btn-tbl-history" onclick="loadAllTasks()">
+          <span>🔄 Refresh</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Team Tasks Data Table -->
+    <section class="table-container">
+      <table class="manage-table">
+        <thead>
+          <tr>
+            <th>ID &amp; Deliverable</th>
+            <th>Assignee</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Due Date</th>
+            <th>Assigned By</th>
+            <th style="text-align: right;">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="tasksTableBody">
+          <tr>
+            <td colspan="8">
+              <div class="empty-state">
+                <div class="empty-state-icon">🔄</div>
+                <div class="empty-state-title">Loading team tasks...</div>
+                <div class="empty-state-desc">Connecting to the task management service.</div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </main>
+
+  <!-- Modal 1: Create New Task -->
+  <div class="modal-backdrop" id="createTaskModal">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3 class="modal-box-title"><span>➕</span> Create &amp; Assign Task</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('createTaskModal')">&times;</button>
+      </div>
+      <form id="createTaskForm" onsubmit="executeCreateTask(event)">
+        <div class="modal-box-body">
+          <div class="form-group">
+            <label class="form-label" for="newTaskTitle">Task Title *</label>
+            <input type="text" id="newTaskTitle" class="form-control" placeholder="e.g. Implement OAuth2 Refresh Token Rotation" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newTaskAssignee">Assign To Employee *</label>
+            <select id="newTaskAssignee" class="form-control" required>
+              <option value="">-- Select Assignee --</option>
+              <!-- Dynamically populated from employees & users -->
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="newTaskPriority">Priority</label>
+              <select id="newTaskPriority" class="form-control">
+                <option value="MEDIUM">Medium</option>
+                <option value="LOW">Low</option>
+                <option value="HIGH">High</option>
+                <option value="URGENT">Urgent</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="newTaskDueDate">Due Date</label>
+              <input type="date" id="newTaskDueDate" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newTaskStartDate">Start Date (Optional)</label>
+            <input type="date" id="newTaskStartDate" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="newTaskDescription">Detailed Description &amp; Requirements</label>
+            <textarea id="newTaskDescription" rows="4" class="form-control" placeholder="Outline deliverables, acceptance criteria, documentation expectations..."></textarea>
+          </div>
+        </div>
+        <div class="modal-box-footer">
+          <button type="button" class="btn-tbl-action btn-tbl-edit" onclick="closeModal('createTaskModal')">Cancel</button>
+          <button type="submit" class="btn-create-task" id="btnSubmitCreateTask">Create &amp; Assign</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 2: Review Task Modal -->
+  <div class="modal-backdrop" id="reviewTaskModal">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3 class="modal-box-title"><span>🔍</span> Manager Review &amp; Approval</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('reviewTaskModal')">&times;</button>
+      </div>
+      <form id="reviewTaskForm" onsubmit="executeTaskReview(event)">
+        <div class="modal-box-body">
+          <input type="hidden" id="reviewModalTaskId">
+
+          <div style="background: #f8fafc; border: 1px solid var(--admin-border); border-radius: 10px; padding: 14px; margin-bottom: 18px;">
+            <div style="font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px;" id="reviewModalTaskTitle"></div>
+            <div style="font-size: 13px; color: #64748b;">
+              Submitted by <strong id="reviewModalAssignee" style="color: #334155;"></strong>
+            </div>
+          </div>
+
+          <label class="form-label">Review Decision *</label>
+          <div class="decision-cards-grid">
+            <div class="decision-card selected-approve" id="cardDecisionApprove" onclick="setReviewDecision('APPROVE')">
+              <input type="radio" name="reviewAction" id="radioApprove" value="APPROVE" checked>
+              <div>
+                <div style="font-weight: 700; color: #15803d; font-size: 14px;">Approve Task</div>
+                <div style="font-size: 12px; color: #166534; margin-top: 2px;">Marks task as Completed with 100% progress.</div>
+              </div>
+            </div>
+
+            <div class="decision-card" id="cardDecisionChanges" onclick="setReviewDecision('REQUEST_CHANGES')">
+              <input type="radio" name="reviewAction" id="radioChanges" value="REQUEST_CHANGES">
+              <div>
+                <div style="font-weight: 700; color: #b45309; font-size: 14px;">Request Changes</div>
+                <div style="font-size: 12px; color: #92400e; margin-top: 2px;">Returns status to In Progress for revisions.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="reviewFeedback">Manager Feedback &amp; Comments</label>
+            <textarea id="reviewFeedback" rows="4" class="form-control" placeholder="Add praise, notes, or specific items that require revision..."></textarea>
+          </div>
+        </div>
+        <div class="modal-box-footer">
+          <button type="button" class="btn-tbl-action btn-tbl-edit" onclick="closeModal('reviewTaskModal')">Cancel</button>
+          <button type="submit" class="btn-create-task" id="btnSubmitReview" style="background:#7c3aed;">Submit Review Decision</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 3: Edit Task Modal -->
+  <div class="modal-backdrop" id="editTaskModal">
+    <div class="modal-box">
+      <div class="modal-box-header">
+        <h3 class="modal-box-title"><span>✏️</span> Edit Task Details</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('editTaskModal')">&times;</button>
+      </div>
+      <form id="editTaskForm" onsubmit="executeEditTask(event)">
+        <div class="modal-box-body">
+          <input type="hidden" id="editModalTaskId">
+
+          <div class="form-group">
+            <label class="form-label" for="editTaskTitle">Title *</label>
+            <input type="text" id="editTaskTitle" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editTaskPriority">Priority</label>
+              <select id="editTaskPriority" class="form-control">
+                <option value="LOW">Low</option>
+                <option value="MEDIUM">Medium</option>
+                <option value="HIGH">High</option>
+                <option value="URGENT">Urgent</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="editTaskStatus">Status Override</label>
+              <select id="editTaskStatus" class="form-control">
+                <option value="TO_DO">To Do</option>
+                <option value="IN_PROGRESS">In Progress</option>
+                <option value="IN_REVIEW">Under Review</option>
+                <option value="COMPLETED">Completed</option>
+                <option value="CANCELLED">Cancelled</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label" for="editTaskProgress">Progress Percentage (0 - 100)</label>
+              <input type="number" id="editTaskProgress" class="form-control" min="0" max="100">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="editTaskDueDate">Due Date</label>
+              <input type="date" id="editTaskDueDate" class="form-control">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editTaskAssignee">Reassign To</label>
+            <select id="editTaskAssignee" class="form-control">
+              <!-- Dynamically populated -->
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="editTaskDescription">Description</label>
+            <textarea id="editTaskDescription" rows="4" class="form-control"></textarea>
+          </div>
+        </div>
+        <div class="modal-box-footer">
+          <button type="button" class="btn-tbl-action btn-tbl-edit" onclick="closeModal('editTaskModal')">Cancel</button>
+          <button type="submit" class="btn-create-task" id="btnSubmitEdit">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal 4: History / Audit Timeline -->
+  <div class="modal-backdrop" id="taskHistoryModal">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-box-header">
+        <h3 class="modal-box-title"><span>📜</span> Task Audit History</h3>
+        <button type="button" class="modal-close-btn" onclick="closeModal('taskHistoryModal')">&times;</button>
+      </div>
+      <div class="modal-box-body">
+        <div id="historyTaskOverview" style="margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;"></div>
+        <div id="historyTimelineContainer">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+      <div class="modal-box-footer">
+        <button type="button" class="btn-tbl-action btn-tbl-edit" onclick="closeModal('taskHistoryModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer"></div>
+
+  <script src="js/manage-tasks.js"></script>
+</body>
+</html>

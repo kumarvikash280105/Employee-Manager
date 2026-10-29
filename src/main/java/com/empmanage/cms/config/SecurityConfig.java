@@ -100,6 +100,16 @@ public class SecurityConfig {
                 .requestMatchers("/api/roles/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGE")
                 .requestMatchers("/api/permissions/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGE")
 
+                // Task Management HTML Dashboards & API Endpoints
+                .requestMatchers("/employee-tasks.html").authenticated()
+                .requestMatchers("/manage-tasks.html").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_HR_MANAGER", "TASK_VIEW_ALL", "TASK_CREATE", "TASK_REVIEW")
+                .requestMatchers("/api/tasks/my", "/api/tasks/my/**").authenticated()
+                .requestMatchers("/api/tasks/all").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_HR_MANAGER", "ROLE_VIEWER", "TASK_VIEW_ALL")
+                .requestMatchers("/api/tasks/analytics").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "ROLE_HR_MANAGER", "ROLE_VIEWER", "TASK_ANALYTICS_VIEW")
+                .requestMatchers("/api/tasks/*/review").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "TASK_REVIEW")
+                .requestMatchers(HttpMethod.DELETE, "/api/tasks/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGER", "TASK_DELETE")
+                .requestMatchers("/api/tasks/**").authenticated()
+
                 // Management routes & pages with granular permissions
                 .requestMatchers("/admin.html").hasAnyAuthority("ROLE_ADMIN", "ROLE_MANAGE")
                 .requestMatchers("/api/stats/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_HR_MANAGER", "ROLE_MANAGER", "REPORT_VIEW")
